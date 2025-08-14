@@ -7,6 +7,9 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph, Clear},
     Terminal,
 };
+
+mod theme;
+use theme::{ThemeManager, get_tile_color, get_tile_text_color, hex_to_color};
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
@@ -62,6 +65,8 @@ fn run_game<B: ratatui::backend::Backend>(
     let mut show_win = false;
     let mut last_score = game.score().current();
     let mut score_animation = 0;
+    let mut theme_manager = ThemeManager::new();
+    let mut show_theme_help = false;
     
     loop {
         terminal.draw(|f| {
@@ -81,9 +86,9 @@ fn run_game<B: ratatui::backend::Backend>(
 
             // Title
             let title = Paragraph::new(vec![Line::from(vec![Span::styled(
-                "Rusty2048",
+                format!("Rusty2048 - {}", theme_manager.current_theme_name()),
                 Style::default()
-                    .fg(Color::Cyan)
+                    .fg(hex_to_color(&theme_manager.current_theme.title_color))
                     .add_modifier(Modifier::BOLD),
             )])])
             .block(Block::default().borders(Borders::NONE));
@@ -117,26 +122,12 @@ fn run_game<B: ratatui::backend::Backend>(
                         tile.value.to_string()
                     };
 
-                    let style = if tile.is_empty() {
-                        Style::default().fg(Color::Gray)
-                    } else {
-                        match tile.value {
-                            2 => Style::default().fg(Color::White),
-                            4 => Style::default().fg(Color::Yellow),
-                            8 => Style::default().fg(Color::Red),
-                            16 => Style::default().fg(Color::Magenta),
-                            32 => Style::default().fg(Color::Blue),
-                            64 => Style::default().fg(Color::Cyan),
-                            128 => Style::default().fg(Color::Green),
-                            256 => Style::default().fg(Color::Yellow),
-                            512 => Style::default().fg(Color::Red),
-                            1024 => Style::default().fg(Color::Magenta),
-                            2048 => Style::default()
-                                .fg(Color::Yellow)
-                                .add_modifier(Modifier::BOLD),
-                            _ => Style::default().fg(Color::White),
-                        }
-                    };
+                    let tile_color = get_tile_color(tile.value, &theme_manager.current_theme);
+                    let text_color = get_tile_text_color(tile.value, &theme_manager.current_theme);
+                    
+                    let style = Style::default()
+                        .fg(text_color)
+                        .bg(tile_color);
 
                     let cell_widget = Paragraph::new(text)
                         .block(Block::default().borders(Borders::ALL))
@@ -169,27 +160,27 @@ fn run_game<B: ratatui::backend::Backend>(
                     Span::styled(
                         game.score().current().to_string(),
                         if score_animation > 0 {
-                            Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)
+                            Style::default().fg(hex_to_color(&theme_manager.current_theme.score_color)).add_modifier(Modifier::BOLD)
                         } else {
-                            Style::default().fg(Color::Green)
+                            Style::default().fg(hex_to_color(&theme_manager.current_theme.score_color))
                         },
                     ),
                     Span::raw(" | Best: "),
                     Span::styled(
                         game.score().best().to_string(),
-                        Style::default().fg(Color::Yellow),
+                        Style::default().fg(hex_to_color(&theme_manager.current_theme.best_score_color)),
                     ),
                 ]),
                 Line::from(vec![
                     Span::raw("Moves: "),
                     Span::styled(
                         game.moves().to_string(),
-                        Style::default().fg(Color::Cyan),
+                        Style::default().fg(hex_to_color(&theme_manager.current_theme.moves_color)),
                     ),
                     Span::raw(" | Time: "),
                     Span::styled(
                         duration,
-                        Style::default().fg(Color::Magenta),
+                        Style::default().fg(hex_to_color(&theme_manager.current_theme.time_color)),
                     ),
                 ]),
                 Line::from(vec![
@@ -200,6 +191,10 @@ fn run_game<B: ratatui::backend::Backend>(
                     Span::raw(" Restart | "),
                     Span::styled("U", Style::default().fg(Color::White)),
                     Span::raw(" Undo | "),
+                    Span::styled("T", Style::default().fg(Color::White)),
+                    Span::raw(" Theme | "),
+                    Span::styled("H", Style::default().fg(Color::White)),
+                    Span::raw(" Help | "),
                     Span::styled("Q", Style::default().fg(Color::White)),
                     Span::raw(" Quit"),
                 ]),
@@ -213,7 +208,7 @@ fn run_game<B: ratatui::backend::Backend>(
                     }
                     status_text.push(Line::from(vec![
                         Span::styled(
-                            "🎉 恭喜！你赢了！按 R 重新开始或继续游戏",
+                            "🎉 Congratulations! You won! Press R to restart or continue playing",
                             Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD),
                         ),
                     ]));
@@ -224,7 +219,7 @@ fn run_game<B: ratatui::backend::Backend>(
                     }
                     status_text.push(Line::from(vec![
                         Span::styled(
-                            "💀 游戏结束！按 R 重新开始",
+                            "💀 Game Over! Press R to restart",
                             Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
                         ),
                     ]));
@@ -236,25 +231,25 @@ fn run_game<B: ratatui::backend::Backend>(
                     let max_tile = game.board().max_tile();
                     
                     status_text.push(Line::from(vec![
-                        Span::raw("最终分数: "),
+                        Span::raw("Final Score: "),
                         Span::styled(
                             final_score.to_string(),
-                            Style::default().fg(Color::Green).add_modifier(Modifier::BOLD),
+                            Style::default().fg(hex_to_color(&theme_manager.current_theme.score_color)).add_modifier(Modifier::BOLD),
                         ),
-                        Span::raw(" | 最高方块: "),
+                        Span::raw(" | Max Tile: "),
                         Span::styled(
                             max_tile.to_string(),
-                            Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+                            Style::default().fg(hex_to_color(&theme_manager.current_theme.best_score_color)).add_modifier(Modifier::BOLD),
                         ),
                     ]));
                     
                     if final_score > 0 {
                         let avg_score_per_move = final_score as f64 / total_moves as f64;
                         status_text.push(Line::from(vec![
-                            Span::raw("平均每步得分: "),
+                            Span::raw("Avg Score per Move: "),
                             Span::styled(
                                 format!("{:.1}", avg_score_per_move),
-                                Style::default().fg(Color::Cyan),
+                                Style::default().fg(hex_to_color(&theme_manager.current_theme.moves_color)),
                             ),
                         ]));
                     }
@@ -263,6 +258,22 @@ fn run_game<B: ratatui::backend::Backend>(
                     show_game_over = false;
                     show_win = false;
                 }
+            }
+
+            // Add theme help if requested
+            if show_theme_help {
+                status_text.push(Line::from(vec![
+                    Span::styled(
+                        "Available Themes: Classic, Dark, Neon, Retro, Pastel",
+                        Style::default().fg(Color::Cyan),
+                    ),
+                ]));
+                status_text.push(Line::from(vec![
+                    Span::styled(
+                        "Press T to cycle themes, or number keys 1-5 to select directly",
+                        Style::default().fg(Color::Cyan),
+                    ),
+                ]));
             }
 
             let status = Paragraph::new(status_text)
@@ -304,6 +315,27 @@ fn run_game<B: ratatui::backend::Backend>(
                     if game.state() == GameState::Playing {
                         let _ = game.undo();
                     }
+                }
+                KeyCode::Char('t') => {
+                    theme_manager.next_theme();
+                }
+                KeyCode::Char('1') => {
+                    theme_manager.set_theme("Classic");
+                }
+                KeyCode::Char('2') => {
+                    theme_manager.set_theme("Dark");
+                }
+                KeyCode::Char('3') => {
+                    theme_manager.set_theme("Neon");
+                }
+                KeyCode::Char('4') => {
+                    theme_manager.set_theme("Retro");
+                }
+                KeyCode::Char('5') => {
+                    theme_manager.set_theme("Pastel");
+                }
+                KeyCode::Char('h') => {
+                    show_theme_help = !show_theme_help;
                 }
                 _ => {}
             }

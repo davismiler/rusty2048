@@ -9,6 +9,7 @@ repository.workspace = true
 
 [dependencies]
 rusty2048-core = { path = "../core" }
+rusty2048-shared = { path = "../shared" }
 crossterm.workspace = true
 ratatui.workspace = true
 tracing.workspace = true
