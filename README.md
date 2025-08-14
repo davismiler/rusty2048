@@ -2,6 +2,14 @@
 
 A modern implementation of the 2048 game written in Rust, supporting multi-platform deployment.
 
+## 🖼️ Screenshots
+
+<div align="center">
+  <img src="docs/terminal.webp" alt="CLI Version" width="30%" />
+  <img src="docs/desktop.webp" alt="Desktop Version" width="30%" />
+  <img src="docs/web.webp" alt="Web Version" width="30%" />
+</div>
+
 ## ✨ Features
 
 - **High Performance**: Built with Rust, zero-cost abstractions
@@ -10,6 +18,7 @@ A modern implementation of the 2048 game written in Rust, supporting multi-platf
 - **Configurable**: Customizable board size, target score, and more
 - **Replay System**: Record and replay game sessions (CLI version)
 - **AI Mode**: Three AI algorithms with auto-play (CLI version)
+- **Statistics Charts**: Comprehensive game analytics and visualizations (CLI version)
 - **Theme System**: 5 beautiful themes (Classic, Dark, Neon, Retro, Pastel)
 - **Real-time Statistics**: Display current score, best score, moves, and game duration
 - **Game Over Handling**: Show detailed statistics when no moves are possible
@@ -69,6 +78,7 @@ cd web/dist && python3 -m http.server 8000
 - **1-5**: Select theme directly (1=Classic, 2=Dark, 3=Neon, 4=Retro, 5=Pastel)
 - **H**: Toggle theme help
 - **P**: Enter replay mode
+- **C**: Toggle statistics charts
 - **I**: Toggle AI mode
 - **Q** or **ESC**: Quit game
 
@@ -87,6 +97,10 @@ cd web/dist && python3 -m http.server 8000
 - **[ ]**: Switch between AI algorithms (Greedy ↔ Expectimax ↔ MCTS)
 - **+/-**: Adjust AI speed (100ms-2000ms)
 - **Q/ESC**: Exit immediately (even during auto-play)
+
+**Charts Controls:**
+- **Left/Right**: Navigate between chart modes
+- **C**: Toggle charts display
 
 #### Desktop Version
 - **Arrow Keys** or **WASD**: Move tiles
@@ -159,6 +173,30 @@ The CLI version includes an advanced AI system that can play the game automatica
 4. Use **+/-** to adjust speed
 5. Press **Q** to exit at any time
 
+## 📊 Statistics Charts
+
+The CLI version includes comprehensive statistics and analytics:
+
+### Chart Types
+- **Summary**: Overall statistics including games played, win rate, highest scores
+- **Score Trend**: Visual chart showing score progression over last 20 games
+- **Efficiency Trend**: Chart displaying efficiency (score per move) over time
+- **Tile Achievements**: Bar chart showing how often each tile value was achieved
+- **Recent Games**: Table of the last 10 games with detailed statistics
+
+### Features
+- **Automatic Recording**: All games are automatically recorded when they end
+- **Real-time Updates**: Charts update immediately when new data is available
+- **Visual Analytics**: ASCII-based charts for terminal display
+- **Data Persistence**: Statistics are saved to `cli/stats.json` for long-term tracking
+- **Performance Metrics**: Track efficiency, average scores, and improvement trends
+
+### Usage
+1. Press **C** to toggle charts display
+2. Use **Left/Right** arrow keys to navigate between chart types
+3. Charts show alongside the game board for easy comparison
+4. Statistics are automatically updated after each game
+
 ## 🛠️ Development
 
 ### Requirements
@@ -219,12 +257,13 @@ cd desktop && cargo tauri dev
 - [x] Desktop version (Tauri)
 - [x] Replay system (CLI version)
 - [x] AI mode (CLI version)
+- [x] Statistics charts (CLI version)
 
 ### 🔄 Future Enhancements
-- [ ] Statistics charts
 - [ ] Multi-language support
 - [ ] AI mode for Web/Desktop versions
 - [ ] Replay system for Web/Desktop versions
+- [ ] Statistics charts for Web/Desktop versions
 
 ## 📄 License
 

@@ -10,8 +10,10 @@ use ratatui::{
 
 mod theme;
 mod replay;
+mod charts;
 use theme::{ThemeManager, get_tile_color, get_tile_text_color, hex_to_color};
 use replay::ReplayMode;
+use charts::ChartsDisplay;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
@@ -73,6 +75,12 @@ fn run_game<B: ratatui::backend::Backend>(
     let mut ai_controller: Option<AIGameController> = None;
     let mut ai_auto_play = false;
     let mut ai_speed = 800; // AI移动延迟，单位毫秒
+    let mut charts_display = ChartsDisplay::new().unwrap_or_else(|_| {
+        eprintln!("Failed to initialize charts display");
+        std::process::exit(1);
+    });
+    let mut show_charts = false;
+    let mut game_start_time = rusty2048_core::get_current_time();
     
     loop {
         terminal.draw(|f| {
@@ -90,6 +98,21 @@ fn run_game<B: ratatui::backend::Backend>(
                 )
                 .split(size);
 
+            // If charts are shown, use different layout
+            let (title_area, game_area, charts_area, status_area) = if show_charts {
+                let chart_chunks = Layout::default()
+                    .direction(LayoutDirection::Horizontal)
+                    .constraints([
+                        Constraint::Length(40), // Game area
+                        Constraint::Min(0),     // Charts area
+                    ].as_ref())
+                    .split(chunks[1]);
+                
+                (chunks[0], chart_chunks[0], Some(chart_chunks[1]), chunks[2])
+            } else {
+                (chunks[0], chunks[1], None, chunks[2])
+            };
+
             // Title
             let title = Paragraph::new(vec![Line::from(vec![Span::styled(
                 format!("Rusty2048 - {}", theme_manager.current_theme_name()),
@@ -98,7 +121,7 @@ fn run_game<B: ratatui::backend::Backend>(
                     .add_modifier(Modifier::BOLD),
             )])])
             .block(Block::default().borders(Borders::NONE));
-            f.render_widget(title, chunks[0]);
+            f.render_widget(title, title_area);
 
             // Game board
             let board_chunks = Layout::default()
@@ -108,7 +131,7 @@ fn run_game<B: ratatui::backend::Backend>(
                         .map(|_| Constraint::Length(3))
                         .collect::<Vec<_>>(),
                 )
-                .split(chunks[1]);
+                .split(game_area);
 
             for (row, &chunk) in board_chunks.iter().enumerate() {
                 let row_chunks = Layout::default()
@@ -140,6 +163,11 @@ fn run_game<B: ratatui::backend::Backend>(
                         .style(style);
                     f.render_widget(cell_widget, cell);
                 }
+            }
+
+            // Render charts if enabled
+            if let Some(charts_area) = charts_area {
+                charts_display.render(f, charts_area);
             }
 
             // Get game stats and check for score changes
@@ -201,6 +229,8 @@ fn run_game<B: ratatui::backend::Backend>(
                     Span::raw(" Theme | "),
                                     Span::styled("P", Style::default().fg(Color::White)),
                 Span::raw(" Replay | "),
+                Span::styled("C", Style::default().fg(Color::White)),
+                Span::raw(" Charts | "),
                 Span::styled("I", Style::default().fg(Color::White)),
                 Span::raw(" AI | "),
                 Span::styled("H", Style::default().fg(Color::White)),
@@ -215,6 +245,22 @@ fn run_game<B: ratatui::backend::Backend>(
                 GameState::Won => {
                     if !show_win {
                         show_win = true;
+                        
+                        // Record game statistics
+                        let end_time = rusty2048_core::get_current_time();
+                        let session_stats = rusty2048_core::create_session_stats(
+                            game.score().current(),
+                            game.moves(),
+                            game.stats().duration,
+                            game.board().max_tile(),
+                            true, // Won
+                            game_start_time,
+                            end_time,
+                        );
+                        
+                        if let Err(e) = charts_display.stats_manager().record_session(session_stats) {
+                            eprintln!("Failed to record game statistics: {}", e);
+                        }
                     }
                     status_text.push(Line::from(vec![
                         Span::styled(
@@ -226,6 +272,22 @@ fn run_game<B: ratatui::backend::Backend>(
                 GameState::GameOver => {
                     if !show_game_over {
                         show_game_over = true;
+                        
+                        // Record game statistics
+                        let end_time = rusty2048_core::get_current_time();
+                        let session_stats = rusty2048_core::create_session_stats(
+                            game.score().current(),
+                            game.moves(),
+                            game.stats().duration,
+                            game.board().max_tile(),
+                            false, // Game over, not won
+                            game_start_time,
+                            end_time,
+                        );
+                        
+                        if let Err(e) = charts_display.stats_manager().record_session(session_stats) {
+                            eprintln!("Failed to record game statistics: {}", e);
+                        }
                     }
                     status_text.push(Line::from(vec![
                         Span::styled(
@@ -316,9 +378,19 @@ fn run_game<B: ratatui::backend::Backend>(
                 ]));
             }
 
+            // Add charts status if enabled
+            if show_charts {
+                status_text.push(Line::from(vec![
+                    Span::styled(
+                        format!("📊 Charts: {} | Use Left/Right to navigate", charts_display.mode_name()),
+                        Style::default().fg(Color::Green).add_modifier(Modifier::BOLD),
+                    ),
+                ]));
+            }
+
             let status = Paragraph::new(status_text)
                 .block(Block::default().borders(Borders::NONE));
-            f.render_widget(status, chunks[2]);
+            f.render_widget(status, status_area);
         })?;
 
         // Check for user input with timeout
@@ -396,6 +468,7 @@ fn run_game<B: ratatui::backend::Backend>(
                         let _ = game.new_game();
                         show_game_over = false;
                         show_win = false;
+                        game_start_time = rusty2048_core::get_current_time();
                     }
                     KeyCode::Char('u') => {
                         if game.state() == GameState::Playing {
@@ -428,6 +501,10 @@ fn run_game<B: ratatui::backend::Backend>(
                         if let Err(e) = ReplayMode::new()?.run(terminal) {
                             eprintln!("Replay mode error: {}", e);
                         }
+                    }
+                    KeyCode::Char('c') => {
+                        // Toggle charts display
+                        show_charts = !show_charts;
                     }
                     KeyCode::Char('i') => {
                         // Toggle AI mode
@@ -493,6 +570,18 @@ fn run_game<B: ratatui::backend::Backend>(
                         // Decrease AI speed (increase delay)
                         if ai_mode {
                             ai_speed = (ai_speed + 100).min(2000);
+                        }
+                    }
+                    KeyCode::Left => {
+                        // Previous chart mode
+                        if show_charts {
+                            charts_display.prev_mode();
+                        }
+                    }
+                    KeyCode::Right => {
+                        // Next chart mode
+                        if show_charts {
+                            charts_display.next_mode();
                         }
                     }
                     _ => {}

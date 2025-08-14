@@ -14,6 +14,7 @@ pub mod score;
 pub mod error;
 pub mod replay;
 pub mod ai;
+pub mod stats;
 
 pub use board::Board;
 pub use game::{Game, GameState, Direction};
@@ -22,6 +23,24 @@ pub use score::Score;
 pub use error::{GameError, GameResult};
 pub use replay::{ReplayRecorder, ReplayPlayer, ReplayManager, ReplayData, ReplayMove, ReplayMetadata};
 pub use ai::{AIPlayer, AIGameController, AIAlgorithm};
+pub use stats::{StatisticsManager, StatisticsSummary, GameSessionStats, create_session_stats};
+
+/// Get current time as Unix timestamp
+pub fn get_current_time() -> u64 {
+    #[cfg(target_arch = "wasm32")]
+    {
+        // For WASM, return 0 for now
+        0
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        use std::time::{SystemTime, UNIX_EPOCH};
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs()
+    }
+}
 
 /// Game configuration
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
