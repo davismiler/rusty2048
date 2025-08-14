@@ -16,9 +16,10 @@ rusty2048-shared = { path = "../shared" }
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
 js-sys.workspace = true
-web-sys.workspace = true
+web-sys = { version = "0.3", features = ["console"] }
 gloo-timers.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 serde-wasm-bindgen = "0.6"
 getrandom = { version = "0.2", features = ["js"] }
+console_error_panic_hook = "0.1"

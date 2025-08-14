@@ -1,6 +1,8 @@
 use wasm_bindgen::prelude::*;
 use rusty2048_core::{Game, GameConfig, Direction};
 use rusty2048_shared::Theme;
+use console_error_panic_hook;
+use web_sys::console;
 
 #[wasm_bindgen]
 pub struct Rusty2048Web {
@@ -12,10 +14,23 @@ pub struct Rusty2048Web {
 impl Rusty2048Web {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Result<Rusty2048Web, JsValue> {
+        // Set up panic hook for better error messages
+        console_error_panic_hook::set_once();
+        
+        console::log_1(&"Initializing Rusty2048Web...".into());
+        
         let mut config = GameConfig::default();
         // Use a fixed seed for WASM to avoid entropy issues
         config.seed = Some(42);
-        let game = Game::new(config).map_err(|e| JsValue::from_str(&e.to_string()))?;
+        
+        console::log_1(&"Creating game with config...".into());
+        let game = Game::new(config).map_err(|e| {
+            let error_msg = format!("Failed to create game: {}", e);
+            console::error_1(&error_msg.into());
+            JsValue::from_str(&e.to_string())
+        })?;
+        
+        console::log_1(&"Game created successfully!".into());
         let theme = Theme::default();
         Ok(Rusty2048Web { game, theme })
     }
@@ -119,4 +134,10 @@ impl Rusty2048Web {
     pub fn get_max_tile(&self) -> u32 {
         self.game.board().max_tile()
     }
+}
+
+/// Initialize panic hook for better error messages
+#[wasm_bindgen]
+pub fn init_panic_hook() {
+    console_error_panic_hook::set_once();
 }

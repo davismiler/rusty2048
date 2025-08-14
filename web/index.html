@@ -251,7 +251,7 @@
     </div>
 
     <script type="module">
-        import init, { Rusty2048Web } from './pkg/rusty2048_web.js';
+        import init, { Rusty2048Web, init_panic_hook } from './pkg/rusty2048_web.js';
 
         let game;
         let currentTheme = 'Classic';
@@ -259,6 +259,8 @@
         // Initialize the game
         async function initGame() {
             await init();
+            // Set up panic hook for better error messages
+            init_panic_hook();
             game = new Rusty2048Web();
             await updateDisplay();
             setupEventListeners();

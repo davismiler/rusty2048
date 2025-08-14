@@ -22,6 +22,7 @@ mkdir -p dist
 # Copy HTML and assets to dist
 echo "📁 Copying files to dist..."
 cp index.html dist/
+cp test-panic.html dist/
 cp -r pkg dist/
 
 echo "✅ Build complete! Files are in the 'dist' directory."
