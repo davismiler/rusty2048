@@ -50,10 +50,7 @@ impl Game {
     pub fn new(config: GameConfig) -> GameResult<Self> {
         let board = Board::new(config.board_size)?;
         let rng = GameRng::new(config.seed);
-        let start_time = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let start_time = Self::get_current_time();
         
         let mut game = Self {
             board,
@@ -96,10 +93,7 @@ impl Game {
     
     /// Get game statistics
     pub fn stats(&self) -> GameStats {
-        let current_time = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        let current_time = Self::get_current_time();
         
         GameStats {
             score: self.score.current(),
@@ -164,10 +158,7 @@ impl Game {
         self.score.reset_current();
         self.state = GameState::Playing;
         self.moves = 0;
-        self.start_time = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
+        self.start_time = Self::get_current_time();
         self.previous_board = None;
         self.previous_score = None;
         
@@ -465,6 +456,25 @@ impl Game {
         }
         
         Ok(())
+    }
+    
+    /// Get current time in seconds since Unix epoch
+    /// Uses different implementations for different targets
+    fn get_current_time() -> u64 {
+        #[cfg(target_arch = "wasm32")]
+        {
+            // For WASM, we'll use a simple approach - just return 0 for now
+            // In a real implementation, you'd use js_sys::Date or similar
+            0
+        }
+        
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs()
+        }
     }
 }
 

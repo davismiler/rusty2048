@@ -1,0 +1,23 @@
+{
+  "name": "rusty2048-web",
+  "version": "0.1.0",
+  "description": "Web version of Rusty2048 game",
+  "main": "index.html",
+  "scripts": {
+    "build": "./build.sh",
+    "serve": "cd dist && python3 -m http.server 8000",
+    "dev": "npm run build && npm run serve"
+  },
+  "keywords": [
+    "2048",
+    "game",
+    "rust",
+    "wasm",
+    "web"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "wasm-pack": "^0.12.0"
+  }
+}

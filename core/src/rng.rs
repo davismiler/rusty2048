@@ -21,6 +21,9 @@ impl GameRng {
     
     /// Generate a random value between 0 and max (exclusive)
     pub fn gen_range(&mut self, max: usize) -> usize {
+        if max == 0 {
+            return 0;
+        }
         self.rng.gen_range(0..max)
     }
     

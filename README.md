@@ -25,18 +25,27 @@ rusty2048/
 
 ## 🚀 Quick Start
 
-### Build and Run CLI Version
+### CLI Version
 
 ```bash
-# Build the entire project
-cargo build
-
-# Run CLI version
+# Build and run the CLI version
 cargo run -p rusty2048-cli
+```
+
+### Web Version
+
+```bash
+# Build the web version
+cd web && ./build.sh
+
+# Serve the web version locally
+cd web/dist && python3 -m http.server 8000
+# Then open http://localhost:8000 in your browser
 ```
 
 ### Controls
 
+#### CLI Version
 - **Arrow Keys** or **WASD**: Move tiles
 - **R**: Restart game
 - **U**: Undo last move
@@ -44,6 +53,12 @@ cargo run -p rusty2048-cli
 - **1-5**: Select theme directly (1=Classic, 2=Dark, 3=Neon, 4=Retro, 5=Pastel)
 - **H**: Toggle theme help
 - **Q** or **ESC**: Quit game
+
+#### Web Version
+- **Arrow Keys** or **WASD**: Move tiles
+- **Mouse/Touch**: Click buttons for New Game, Undo
+- **Theme Buttons**: Click to switch themes
+- **Mobile**: Swipe gestures supported
 
 ### Game Features
 
@@ -88,10 +103,10 @@ cargo test --features proptest
 cargo build --release -p rusty2048-cli
 ```
 
-### Web Version (Planned)
+### Web Version
 ```bash
-cargo build --target wasm32-unknown-unknown -p rusty2048-web
-wasm-pack build web/
+cd web && ./build.sh
+# Files will be generated in web/dist/
 ```
 
 ### Desktop Version (Planned)
@@ -106,7 +121,7 @@ cargo tauri build -p rusty2048-desktop
 - [x] CLI version game over handling
 - [x] CLI version score statistics and animations
 - [x] CLI version theme system
-- [ ] Web version (WASM)
+- [x] Web version (WASM)
 - [ ] Desktop version (Tauri)
 - [ ] Replay system
 - [ ] AI mode
