@@ -23,6 +23,9 @@ pub enum GameError {
     
     #[error("Random number generation error: {0}")]
     RngError(String),
+    
+    #[error("Invalid operation: {0}")]
+    InvalidOperation(String),
 }
 
 /// Result type for game operations

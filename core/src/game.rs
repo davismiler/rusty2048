@@ -460,7 +460,7 @@ impl Game {
     
     /// Get current time in seconds since Unix epoch
     /// Uses different implementations for different targets
-    fn get_current_time() -> u64 {
+    pub fn get_current_time() -> u64 {
         #[cfg(target_arch = "wasm32")]
         {
             // For WASM, we'll use a simple approach - just return 0 for now

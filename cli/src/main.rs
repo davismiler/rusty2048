@@ -9,7 +9,9 @@ use ratatui::{
 };
 
 mod theme;
+mod replay;
 use theme::{ThemeManager, get_tile_color, get_tile_text_color, hex_to_color};
+use replay::ReplayMode;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
@@ -193,6 +195,8 @@ fn run_game<B: ratatui::backend::Backend>(
                     Span::raw(" Undo | "),
                     Span::styled("T", Style::default().fg(Color::White)),
                     Span::raw(" Theme | "),
+                    Span::styled("P", Style::default().fg(Color::White)),
+                    Span::raw(" Replay | "),
                     Span::styled("H", Style::default().fg(Color::White)),
                     Span::raw(" Help | "),
                     Span::styled("Q", Style::default().fg(Color::White)),
@@ -296,7 +300,7 @@ fn run_game<B: ratatui::backend::Backend>(
                         let _ = game.make_move(Direction::Down);
                     }
                 }
-                KeyCode::Left | KeyCode::Char('a') | KeyCode::Char('h') => {
+                KeyCode::Left | KeyCode::Char('a') => {
                     if game.state() == GameState::Playing {
                         let _ = game.make_move(Direction::Left);
                     }
@@ -336,6 +340,12 @@ fn run_game<B: ratatui::backend::Backend>(
                 }
                 KeyCode::Char('h') => {
                     show_theme_help = !show_theme_help;
+                }
+                KeyCode::Char('p') => {
+                    // Enter replay mode
+                    if let Err(e) = ReplayMode::new()?.run(terminal) {
+                        eprintln!("Replay mode error: {}", e);
+                    }
                 }
                 _ => {}
             }
