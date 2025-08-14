@@ -1,4 +1,4 @@
-use rusty2048_core::{Game, GameConfig, Direction, GameState, GameStats};
+use rusty2048_core::{Game, GameConfig, Direction, GameState, GameStats, AIGameController, AIAlgorithm};
 use ratatui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction as LayoutDirection, Layout, Rect},
@@ -69,6 +69,10 @@ fn run_game<B: ratatui::backend::Backend>(
     let mut score_animation = 0;
     let mut theme_manager = ThemeManager::new();
     let mut show_theme_help = false;
+    let mut ai_mode = false;
+    let mut ai_controller: Option<AIGameController> = None;
+    let mut ai_auto_play = false;
+    let mut ai_speed = 800; // AI移动延迟，单位毫秒
     
     loop {
         terminal.draw(|f| {
@@ -195,12 +199,14 @@ fn run_game<B: ratatui::backend::Backend>(
                     Span::raw(" Undo | "),
                     Span::styled("T", Style::default().fg(Color::White)),
                     Span::raw(" Theme | "),
-                    Span::styled("P", Style::default().fg(Color::White)),
-                    Span::raw(" Replay | "),
-                    Span::styled("H", Style::default().fg(Color::White)),
-                    Span::raw(" Help | "),
-                    Span::styled("Q", Style::default().fg(Color::White)),
-                    Span::raw(" Quit"),
+                                    Span::styled("P", Style::default().fg(Color::White)),
+                Span::raw(" Replay | "),
+                Span::styled("I", Style::default().fg(Color::White)),
+                Span::raw(" AI | "),
+                Span::styled("H", Style::default().fg(Color::White)),
+                Span::raw(" Help | "),
+                Span::styled("Q", Style::default().fg(Color::White)),
+                Span::raw(" Quit"),
                 ]),
             ];
 
@@ -264,6 +270,36 @@ fn run_game<B: ratatui::backend::Backend>(
                 }
             }
 
+            // Add AI mode status
+            if ai_mode {
+                let algo_name = if let Some(controller) = &ai_controller {
+                    match controller.algorithm() {
+                        AIAlgorithm::Greedy => "Greedy",
+                        AIAlgorithm::Expectimax => "Expectimax",
+                        AIAlgorithm::MCTS => "MCTS",
+                    }
+                } else {
+                    "None"
+                };
+                
+                status_text.push(Line::from(vec![
+                    Span::styled(
+                        format!("🤖 AI Mode: {} | Auto-play: {} | Speed: {}ms", 
+                            algo_name, 
+                            if ai_auto_play { "ON" } else { "OFF" },
+                            ai_speed
+                        ),
+                        Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD),
+                    ),
+                ]));
+                status_text.push(Line::from(vec![
+                    Span::styled(
+                        "AI Controls: O=Auto-play, []=Prev Algo, ]=Next Algo, +/-=Speed",
+                        Style::default().fg(Color::Magenta),
+                    ),
+                ]));
+            }
+
             // Add theme help if requested
             if show_theme_help {
                 status_text.push(Line::from(vec![
@@ -285,69 +321,182 @@ fn run_game<B: ratatui::backend::Backend>(
             f.render_widget(status, chunks[2]);
         })?;
 
-        if let Event::Key(key) = event::read()? {
-            match key.code {
-                KeyCode::Char('q') | KeyCode::Esc => {
-                    return Ok(());
-                }
-                KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('k') => {
-                    if game.state() == GameState::Playing {
-                        let _ = game.make_move(Direction::Up);
+        // Check for user input with timeout
+        
+        // Use non-blocking event polling for AI mode
+        if ai_mode && ai_auto_play && game.state() == GameState::Playing {
+            // Check for immediate exit
+            if event::poll(std::time::Duration::from_millis(100))? {
+                if let Event::Key(key) = event::read()? {
+                    match key.code {
+                        KeyCode::Char('q') | KeyCode::Esc => {
+                            return Ok(());
+                        }
+                        KeyCode::Char('o') => {
+                            ai_auto_play = false;
+                        }
+                        KeyCode::Char('+') | KeyCode::Char('=') => {
+                            // Increase AI speed (decrease delay)
+                            ai_speed = (ai_speed as i32 - 100).max(100) as u64;
+                        }
+                        KeyCode::Char('-') => {
+                            // Decrease AI speed (increase delay)
+                            ai_speed = (ai_speed + 100).min(2000);
+                        }
+                        _ => {}
                     }
                 }
-                KeyCode::Down | KeyCode::Char('s') | KeyCode::Char('j') => {
-                    if game.state() == GameState::Playing {
-                        let _ = game.make_move(Direction::Down);
+            }
+            
+            // Make AI move if no exit was requested
+            if ai_auto_play {
+                if let Some(controller) = &mut ai_controller {
+                    // Sync AI controller with current game state
+                    *controller.game_mut() = game.clone();
+                    
+                    if let Ok(moved) = controller.make_ai_move() {
+                        if moved {
+                            // Update the main game with AI's move
+                            *game = controller.game().clone();
+                            
+                            // Add delay for AI speed control
+                            std::thread::sleep(std::time::Duration::from_millis(ai_speed));
+                        }
                     }
                 }
-                KeyCode::Left | KeyCode::Char('a') => {
-                    if game.state() == GameState::Playing {
-                        let _ = game.make_move(Direction::Left);
+            }
+        } else {
+            // Normal blocking event read for manual mode
+            if let Event::Key(key) = event::read()? {
+                match key.code {
+                    KeyCode::Char('q') | KeyCode::Esc => {
+                        return Ok(());
                     }
-                }
-                KeyCode::Right | KeyCode::Char('d') | KeyCode::Char('l') => {
-                    if game.state() == GameState::Playing {
-                        let _ = game.make_move(Direction::Right);
+                    KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('k') => {
+                        if game.state() == GameState::Playing {
+                            let _ = game.make_move(Direction::Up);
+                        }
                     }
-                }
-                KeyCode::Char('r') => {
-                    let _ = game.new_game();
-                    show_game_over = false;
-                    show_win = false;
-                }
-                KeyCode::Char('u') => {
-                    if game.state() == GameState::Playing {
-                        let _ = game.undo();
+                    KeyCode::Down | KeyCode::Char('s') | KeyCode::Char('j') => {
+                        if game.state() == GameState::Playing {
+                            let _ = game.make_move(Direction::Down);
+                        }
                     }
-                }
-                KeyCode::Char('t') => {
-                    theme_manager.next_theme();
-                }
-                KeyCode::Char('1') => {
-                    theme_manager.set_theme("Classic");
-                }
-                KeyCode::Char('2') => {
-                    theme_manager.set_theme("Dark");
-                }
-                KeyCode::Char('3') => {
-                    theme_manager.set_theme("Neon");
-                }
-                KeyCode::Char('4') => {
-                    theme_manager.set_theme("Retro");
-                }
-                KeyCode::Char('5') => {
-                    theme_manager.set_theme("Pastel");
-                }
-                KeyCode::Char('h') => {
-                    show_theme_help = !show_theme_help;
-                }
-                KeyCode::Char('p') => {
-                    // Enter replay mode
-                    if let Err(e) = ReplayMode::new()?.run(terminal) {
-                        eprintln!("Replay mode error: {}", e);
+                    KeyCode::Left | KeyCode::Char('a') => {
+                        if game.state() == GameState::Playing {
+                            let _ = game.make_move(Direction::Left);
+                        }
                     }
+                    KeyCode::Right | KeyCode::Char('d') | KeyCode::Char('l') => {
+                        if game.state() == GameState::Playing {
+                            let _ = game.make_move(Direction::Right);
+                        }
+                    }
+                    KeyCode::Char('r') => {
+                        let _ = game.new_game();
+                        show_game_over = false;
+                        show_win = false;
+                    }
+                    KeyCode::Char('u') => {
+                        if game.state() == GameState::Playing {
+                            let _ = game.undo();
+                        }
+                    }
+                    KeyCode::Char('t') => {
+                        theme_manager.next_theme();
+                    }
+                    KeyCode::Char('1') => {
+                        theme_manager.set_theme("Classic");
+                    }
+                    KeyCode::Char('2') => {
+                        theme_manager.set_theme("Dark");
+                    }
+                    KeyCode::Char('3') => {
+                        theme_manager.set_theme("Neon");
+                    }
+                    KeyCode::Char('4') => {
+                        theme_manager.set_theme("Retro");
+                    }
+                    KeyCode::Char('5') => {
+                        theme_manager.set_theme("Pastel");
+                    }
+                    KeyCode::Char('h') => {
+                        show_theme_help = !show_theme_help;
+                    }
+                    KeyCode::Char('p') => {
+                        // Enter replay mode
+                        if let Err(e) = ReplayMode::new()?.run(terminal) {
+                            eprintln!("Replay mode error: {}", e);
+                        }
+                    }
+                    KeyCode::Char('i') => {
+                        // Toggle AI mode
+                        if ai_mode {
+                            ai_mode = false;
+                            ai_controller = None;
+                            ai_auto_play = false;
+                        } else {
+                            ai_mode = true;
+                            match AIGameController::new(game.config().clone(), AIAlgorithm::Greedy) {
+                                Ok(controller) => ai_controller = Some(controller),
+                                Err(e) => eprintln!("Failed to initialize AI: {}", e),
+                            }
+                        }
+                    }
+                    KeyCode::Char('o') => {
+                        // Toggle AI auto-play
+                        if ai_mode && ai_controller.is_some() {
+                            ai_auto_play = !ai_auto_play;
+                        }
+                    }
+                    KeyCode::Char('[') => {
+                        // Switch to previous AI algorithm
+                        if ai_mode {
+                            if let Some(controller) = &mut ai_controller {
+                                let current_algo = controller.algorithm();
+                                let new_algo = match current_algo {
+                                    AIAlgorithm::Greedy => AIAlgorithm::MCTS,
+                                    AIAlgorithm::Expectimax => AIAlgorithm::Greedy,
+                                    AIAlgorithm::MCTS => AIAlgorithm::Expectimax,
+                                };
+                                match AIGameController::new(game.config().clone(), new_algo) {
+                                    Ok(new_controller) => ai_controller = Some(new_controller),
+                                    Err(e) => eprintln!("Failed to switch AI algorithm: {}", e),
+                                }
+                            }
+                        }
+                    }
+                    KeyCode::Char(']') => {
+                        // Switch to next AI algorithm
+                        if ai_mode {
+                            if let Some(controller) = &mut ai_controller {
+                                let current_algo = controller.algorithm();
+                                let new_algo = match current_algo {
+                                    AIAlgorithm::Greedy => AIAlgorithm::Expectimax,
+                                    AIAlgorithm::Expectimax => AIAlgorithm::MCTS,
+                                    AIAlgorithm::MCTS => AIAlgorithm::Greedy,
+                                };
+                                match AIGameController::new(game.config().clone(), new_algo) {
+                                    Ok(new_controller) => ai_controller = Some(new_controller),
+                                    Err(e) => eprintln!("Failed to switch AI algorithm: {}", e),
+                                }
+                            }
+                        }
+                    }
+                    KeyCode::Char('+') | KeyCode::Char('=') => {
+                        // Increase AI speed (decrease delay)
+                        if ai_mode {
+                            ai_speed = (ai_speed as i32 - 100).max(100) as u64;
+                        }
+                    }
+                    KeyCode::Char('-') => {
+                        // Decrease AI speed (increase delay)
+                        if ai_mode {
+                            ai_speed = (ai_speed + 100).min(2000);
+                        }
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
         }
     }

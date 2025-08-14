@@ -13,6 +13,7 @@ pub mod rng;
 pub mod score;
 pub mod error;
 pub mod replay;
+pub mod ai;
 
 pub use board::Board;
 pub use game::{Game, GameState, Direction};
@@ -20,6 +21,7 @@ pub use rng::GameRng;
 pub use score::Score;
 pub use error::{GameError, GameResult};
 pub use replay::{ReplayRecorder, ReplayPlayer, ReplayManager, ReplayData, ReplayMove, ReplayMetadata};
+pub use ai::{AIPlayer, AIGameController, AIAlgorithm};
 
 /// Game configuration
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

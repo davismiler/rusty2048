@@ -9,6 +9,7 @@ A modern implementation of the 2048 game written in Rust, supporting multi-platf
 - **Modern UI**: Smooth animations and beautiful interfaces
 - **Configurable**: Customizable board size, target score, and more
 - **Replay System**: Record and replay game sessions (CLI version)
+- **AI Mode**: Three AI algorithms with auto-play (CLI version)
 - **Theme System**: 5 beautiful themes (Classic, Dark, Neon, Retro, Pastel)
 - **Real-time Statistics**: Display current score, best score, moves, and game duration
 - **Game Over Handling**: Show detailed statistics when no moves are possible
@@ -68,6 +69,7 @@ cd web/dist && python3 -m http.server 8000
 - **1-5**: Select theme directly (1=Classic, 2=Dark, 3=Neon, 4=Retro, 5=Pastel)
 - **H**: Toggle theme help
 - **P**: Enter replay mode
+- **I**: Toggle AI mode
 - **Q** or **ESC**: Quit game
 
 **Replay Mode Controls:**
@@ -79,6 +81,12 @@ cd web/dist && python3 -m http.server 8000
 - **Left/Right**: Step through replay
 - **+/-**: Adjust replay speed
 - **S**: Stop recording
+
+**AI Mode Controls:**
+- **O**: Toggle auto-play
+- **[ ]**: Switch between AI algorithms (Greedy ↔ Expectimax ↔ MCTS)
+- **+/-**: Adjust AI speed (100ms-2000ms)
+- **Q/ESC**: Exit immediately (even during auto-play)
 
 #### Desktop Version
 - **Arrow Keys** or **WASD**: Move tiles
@@ -127,6 +135,29 @@ Replay files are saved as JSON and include:
 3. Play normally - all moves are automatically recorded
 4. Press **S** to stop recording and save
 5. Choose **2** to load and play back saved replays
+
+## 🤖 AI Mode
+
+The CLI version includes an advanced AI system that can play the game automatically:
+
+### AI Algorithms
+- **Greedy**: Simple algorithm that chooses the move with highest immediate score
+- **Expectimax**: Advanced search algorithm that considers future moves and random tile placements
+- **MCTS**: Monte Carlo Tree Search with UCB1 formula for optimal decision making
+
+### Features
+- **Auto-play**: Watch AI play the game automatically
+- **Speed Control**: Adjust AI move speed from 100ms to 2000ms
+- **Algorithm Switching**: Switch between different AI algorithms in real-time
+- **Real-time Status**: Display current algorithm, auto-play state, and speed
+- **Non-blocking**: AI runs smoothly without blocking user input
+
+### Usage
+1. Press **I** to enter AI mode
+2. Press **O** to start auto-play
+3. Use **[ ]** to switch between algorithms
+4. Use **+/-** to adjust speed
+5. Press **Q** to exit at any time
 
 ## 🛠️ Development
 
@@ -187,11 +218,12 @@ cd desktop && cargo tauri dev
 - [x] Web version (WASM)
 - [x] Desktop version (Tauri)
 - [x] Replay system (CLI version)
+- [x] AI mode (CLI version)
 
 ### 🔄 Future Enhancements
-- [ ] AI mode
 - [ ] Statistics charts
 - [ ] Multi-language support
+- [ ] AI mode for Web/Desktop versions
 - [ ] Replay system for Web/Desktop versions
 
 ## 📄 License

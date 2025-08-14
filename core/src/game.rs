@@ -76,6 +76,11 @@ impl Game {
         &self.board
     }
     
+    /// Get mutable reference to current board
+    pub fn board_mut(&mut self) -> &mut Board {
+        &mut self.board
+    }
+    
     /// Get current score
     pub fn score(&self) -> &Score {
         &self.score
@@ -89,6 +94,11 @@ impl Game {
     /// Get number of moves
     pub fn moves(&self) -> u32 {
         self.moves
+    }
+    
+    /// Get game configuration
+    pub fn config(&self) -> &GameConfig {
+        &self.config
     }
     
     /// Get game statistics
