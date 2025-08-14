@@ -167,6 +167,31 @@ impl Board {
             .filter(|tile| tile.value == value)
             .count()
     }
+    
+    /// Convert board to 2D vector of u32 values
+    pub fn to_vec(&self) -> Vec<Vec<u32>> {
+        self.tiles.iter()
+            .map(|row| row.iter().map(|tile| tile.value).collect())
+            .collect()
+    }
+    
+    /// Create board from 2D vector of u32 values
+    pub fn from_vec(values: Vec<Vec<u32>>) -> GameResult<Self> {
+        if values.is_empty() || values[0].is_empty() {
+            return Err(GameError::InvalidBoardSize { size: 0 });
+        }
+        
+        let size = values.len();
+        if values.iter().any(|row| row.len() != size) {
+            return Err(GameError::InvalidBoardSize { size });
+        }
+        
+        let tiles = values.iter()
+            .map(|row| row.iter().map(|&value| Tile::new(value)).collect())
+            .collect();
+        
+        Ok(Self { tiles, size })
+    }
 }
 
 #[cfg(test)]

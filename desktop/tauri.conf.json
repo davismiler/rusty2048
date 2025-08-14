@@ -1,7 +1,7 @@
 {
   "$schema": "https://tauri.app/v2/schema.json",
   "identifier": "com.rusty2048.desktop",
-  "productName": "Rusty2048 Desktop",
+  "productName": "Rusty2048",
   "version": "0.1.0",
   "build": {
     "frontendDist": "frontend"
@@ -13,7 +13,7 @@
         "label": "main",
         "fullscreen": false,
         "resizable": true,
-        "title": "Rusty2048 Desktop",
+        "title": "Rusty2048",
         "width": 900,
         "height": 900,
         "minWidth": 700,
