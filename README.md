@@ -40,6 +40,9 @@ cargo run -p rusty2048-cli
 - **Arrow Keys** or **WASD**: Move tiles
 - **R**: Restart game
 - **U**: Undo last move
+- **T**: Cycle through themes
+- **1-5**: Select theme directly (1=Classic, 2=Dark, 3=Neon, 4=Retro, 5=Pastel)
+- **H**: Toggle theme help
 - **Q** or **ESC**: Quit game
 
 ### Game Features
@@ -49,6 +52,7 @@ cargo run -p rusty2048-cli
 - **Victory Notification**: Display victory message when reaching 2048
 - **Score Animation**: Score flashes when tiles merge
 - **Sound Feedback**: Play bell sound when score increases
+- **Theme System**: 5 beautiful themes with different color schemes
 
 ## 🛠️ Development
 
@@ -101,17 +105,13 @@ cargo tauri build -p rusty2048-desktop
 - [x] CLI version basic functionality
 - [x] CLI version game over handling
 - [x] CLI version score statistics and animations
-- [ ] CLI version theme system
+- [x] CLI version theme system
 - [ ] Web version (WASM)
 - [ ] Desktop version (Tauri)
 - [ ] Replay system
 - [ ] AI mode
 - [ ] Statistics charts
 - [ ] Multi-language support
-
-## 🤝 Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## 📄 License
 

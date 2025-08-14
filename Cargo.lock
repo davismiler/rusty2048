@@ -810,6 +810,7 @@ dependencies = [
  "crossterm",
  "ratatui",
  "rusty2048-core",
+ "rusty2048-shared",
  "serde",
  "serde_json",
  "tracing",
