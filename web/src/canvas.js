@@ -36,12 +36,16 @@ export class CanvasManager {
             resizeTo: document.querySelector('.canvas-container'),
             antialias: true,
             powerPreference: 'high-performance',
+            resolution: window.devicePixelRatio || 1,
+            autoDensity: true,
         });
         const container = document.querySelector('.canvas-container');
         const canvas = this.app.canvas;
         canvas.id = 'gameCanvas';
         canvas.style.borderRadius = '12px';
         canvas.style.cursor = 'grab';
+        canvas.style.imageRendering = 'crisp-edges';
+        canvas.style.imageRendering = '-webkit-optimize-contrast';
         // 用新 canvas 替换旧的（如果 HTML 里已有一个占位 canvas）
         const old = document.getElementById('gameCanvas');
         if (old && old !== canvas) old.replaceWith(canvas);
@@ -85,6 +89,10 @@ export class CanvasManager {
         // 居中起点（四舍五入避免半像素导致渲染模糊）
         this.GRID_ORIGIN_X = Math.round((w - actualGridW) / 2);
         this.GRID_ORIGIN_Y = Math.round((h - actualGridH) / 2);
+        
+        // 确保所有位置都是整数像素
+        this.GRID_ORIGIN_X = Math.floor(this.GRID_ORIGIN_X);
+        this.GRID_ORIGIN_Y = Math.floor(this.GRID_ORIGIN_Y);
     }
 
 
@@ -195,7 +203,8 @@ export class CanvasManager {
                 fontFamily: 'Segoe UI, Helvetica Neue, Arial, sans-serif',
                 fontSize,
                 fill: this.TILE_TEXT_COLORS[value] ?? 0x776e65,
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                align: 'center'
             }
         });
         // 用本地边界做 pivot，严格几何居中
@@ -218,7 +227,7 @@ export class CanvasManager {
         const x = this.GRID_ORIGIN_X + this.TILE_GAP + col * (this.TILE_SIZE + this.TILE_GAP);
         const y = this.GRID_ORIGIN_Y + this.TILE_GAP + row * (this.TILE_SIZE + this.TILE_GAP);
         // 用整数像素，避免半像素模糊
-        return { x: Math.round(x), y: Math.round(y) };
+        return { x: Math.floor(x), y: Math.floor(y) };
     }
 
     tweenMove(g, from, to, duration = 150, onEnd) {
@@ -228,8 +237,8 @@ export class CanvasManager {
         const step = (now) => {
             const t = Math.min(1, (now - start) / duration);
             const p = 1 - Math.pow(1 - t, 3);
-            g.x = startXY.x + (endXY.x - startXY.x) * p;
-            g.y = startXY.y + (endXY.y - startXY.y) * p;
+            g.x = Math.floor(startXY.x + (endXY.x - startXY.x) * p);
+            g.y = Math.floor(startXY.y + (endXY.y - startXY.y) * p);
             if (t < 1) requestAnimationFrame(step);
             else if (onEnd) onEnd();
         };
