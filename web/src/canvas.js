@@ -8,7 +8,7 @@ export class CanvasManager {
         this.isAnimating = false;
         this.animationDuration = 150;
 
-        this.GRID_SIZE = 4; 
+        this.GRID_SIZE = 4;
 
         this.TILE_SIZE = 88;        // 每格大小（会重新计算）
         this.TILE_GAP = 12;        // 仅用于格与格之间的间距
@@ -198,9 +198,10 @@ export class CanvasManager {
                 fontWeight: 'bold'
             }
         });
-        txt.anchor.set(0.5);
-        txt.x = half;
-        txt.y = half + Math.floor(fontSize * 0.1);
+        txt.anchor.set(0.5);       // 以文本几何中心为锚点
+        txt.x = half;              // 精确居中
+        txt.y = half;
+        txt.roundPixels = true;    // 避免半像素导致的视觉偏移
 
         inner.addChild(bg);
         inner.addChild(txt);
