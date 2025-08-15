@@ -11,10 +11,14 @@
             padding: 0;
             box-sizing: border-box;
         }
+        
+        html {
+            overflow: hidden;
+        }
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #667eea;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -32,11 +36,6 @@
             background: #1a1a1a;
             border-radius: 45px;
             padding: 25px;
-            box-shadow: 
-                0 0 0 8px #2a2a2a,
-                0 0 0 12px #3a3a3a,
-                0 20px 40px rgba(0,0,0,0.4),
-                inset 0 0 0 2px #4a4a4a;
             position: relative;
         }
 
@@ -99,7 +98,6 @@
             color: #776e65;
             margin-bottom: 15px;
             transition: color 0.3s ease;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         /* GitHub图标 */
@@ -109,7 +107,7 @@
             right: 0;
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, #333 0%, #666 100%);
+            background: #333;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -117,13 +115,10 @@
             color: white;
             text-decoration: none;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .github-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-            background: linear-gradient(135deg, #24292e 0%, #586069 100%);
+            background: #24292e;
         }
 
         .github-link i {
@@ -138,19 +133,12 @@
         }
 
         .stat-box {
-            background: linear-gradient(135deg, #bbada0 0%, #a89a8c 100%);
+            background: #bbada0;
             padding: 15px 20px;
             border-radius: 14px;
             color: white;
             flex: 1;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-
-        .stat-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
         }
 
         .stat-label {
@@ -167,7 +155,7 @@
         }
 
         .grid {
-            background: linear-gradient(135deg, #bbada0 0%, #a89a8c 100%);
+            background: #bbada0;
             border-radius: 14px;
             padding: 15px;
             display: flex;
@@ -175,9 +163,30 @@
             align-items: center;
             margin: 0 auto 25px auto;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            border: 2px solid rgba(255,255,255,0.1);
             width: fit-content;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .grid:active {
+            cursor: grabbing;
+        }
+
+        /* 拖拽提示 */
+        .drag-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(119, 110, 101, 0.3);
+            font-size: 14px;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .grid:hover .drag-hint {
+            opacity: 1;
         }
 
         .grid-row {
@@ -197,26 +206,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 30px;
             font-weight: bold;
             color: #776e65;
             background: #cdc1b4;
             transition: all 0.15s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .tile-2 { background: linear-gradient(135deg, #eee4da 0%, #ede0c8 100%); }
-        .tile-4 { background: linear-gradient(135deg, #ede0c8 0%, #f2b179 100%); }
-        .tile-8 { background: linear-gradient(135deg, #f2b179 0%, #f59563 100%); color: #f9f6f2; }
-        .tile-16 { background: linear-gradient(135deg, #f59563 0%, #f67c5f 100%); color: #f9f6f2; }
-        .tile-32 { background: linear-gradient(135deg, #f67c5f 0%, #f65e3b 100%); color: #f9f6f2; }
-        .tile-64 { background: linear-gradient(135deg, #f65e3b 0%, #edcf72 100%); color: #f9f6f2; }
-        .tile-128 { background: linear-gradient(135deg, #edcf72 0%, #edcc61 100%); color: #f9f6f2; }
-        .tile-256 { background: linear-gradient(135deg, #edcc61 0%, #edc850 100%); color: #f9f6f2; }
-        .tile-512 { background: linear-gradient(135deg, #edc850 0%, #edc53f 100%); color: #f9f6f2; }
-        .tile-1024 { background: linear-gradient(135deg, #edc53f 0%, #edc22e 100%); color: #f9f6f2; }
-        .tile-2048 { background: linear-gradient(135deg, #edc22e 0%, #3c3a32 100%); color: #f9f6f2; }
+        .tile-2 { background: #eee4da; }
+        .tile-4 { background: #ede0c8; }
+        .tile-8 { background: #f2b179; color: #f9f6f2; }
+        .tile-16 { background: #f59563; color: #f9f6f2; }
+        .tile-32 { background: #f67c5f; color: #f9f6f2; }
+        .tile-64 { background: #f65e3b; color: #f9f6f2; }
+        .tile-128 { background: #edcf72; color: #f9f6f2; }
+        .tile-256 { background: #edcc61; color: #f9f6f2; }
+        .tile-512 { background: #edc850; color: #f9f6f2; }
+        .tile-1024 { background: #edc53f; color: #f9f6f2; }
+        .tile-2048 { background: #edc22e; color: #f9f6f2; }
 
         .controls {
             margin-bottom: 15px;
@@ -226,7 +233,7 @@
         }
 
         .btn {
-            background: linear-gradient(135deg, #8f7a66 0%, #7f6a56 100%);
+            background: #8f7a66;
             color: white;
             border: none;
             padding: 12px 20px;
@@ -235,21 +242,15 @@
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            background: linear-gradient(135deg, #7f6a56 0%, #6f5a46 100%);
+            background: #7f6a56;
         }
 
         .btn:disabled {
-            background: linear-gradient(135deg, #ccc 0%, #bbb 100%);
+            background: #ccc;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .theme-selector {
@@ -271,7 +272,7 @@
         }
 
         .theme-btn {
-            background: linear-gradient(135deg, #8f7a66 0%, #7f6a56 100%);
+            background: #8f7a66;
             color: white;
             border: none;
             padding: 8px 14px;
@@ -280,18 +281,14 @@
             font-size: 11px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .theme-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background: #7f6a56;
         }
 
         .theme-btn.active {
-            background: linear-gradient(135deg, #edc22e 0%, #f59563 100%);
-            box-shadow: 0 4px 8px rgba(237, 194, 46, 0.3);
+            background: #edc22e;
         }
 
         .message {
@@ -301,16 +298,15 @@
             padding: 10px;
             border-radius: 8px;
             display: none;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .message.won {
-            background: linear-gradient(135deg, #edc22e 0%, #f59563 100%);
+            background: #edc22e;
             color: #f9f6f2;
         }
 
         .message.game-over {
-            background: linear-gradient(135deg, #f65e3b 0%, #edcf72 100%);
+            background: #f65e3b;
             color: #f9f6f2;
         }
 
@@ -405,7 +401,7 @@
             .tile {
                 width: 80px;
                 height: 80px;
-                font-size: 20px;
+                font-size: 26px;
                 border-radius: 6px;
             }
             
@@ -464,7 +460,7 @@
             .tile {
                 width: 66px;
                 height: 66px;
-                font-size: 19px;
+                font-size: 24px;
             }
             
             .title {
@@ -514,7 +510,7 @@
             .tile {
                 width: 48px;
                 height: 48px;
-                font-size: 14px;
+                font-size: 18px;
             }
             
             .grid {
@@ -612,11 +608,11 @@
             content: '';
             position: absolute;
             top: 50%;
-            left: -2px;
-            width: 4px;
-            height: 60px;
+            left: -1px;
+            width: 2px;
+            height: 50px;
             background: #2a2a2a;
-            border-radius: 2px;
+            border-radius: 1px;
             transform: translateY(-50%);
         }
 
@@ -625,10 +621,10 @@
             position: absolute;
             bottom: 80px;
             left: 50%;
-            width: 60px;
-            height: 4px;
+            width: 50px;
+            height: 2px;
             background: #2a2a2a;
-            border-radius: 2px;
+            border-radius: 1px;
             transform: translateX(-50%);
         }
     </style>
@@ -672,6 +668,7 @@
 
                 <div class="grid" id="grid">
                     <!-- Grid will be generated by JavaScript -->
+                    <div class="drag-hint">拖拽移动</div>
                 </div>
 
                 <div class="message" id="message"></div>
@@ -694,7 +691,7 @@
                 </div>
 
                 <div class="instructions">
-                    Use arrow keys or swipe to move tiles. Combine tiles to reach 2048!
+                    Use arrow keys, mouse drag, or swipe to move tiles. Combine tiles to reach 2048!
                 </div>
             </div>
         </div>
@@ -831,9 +828,9 @@
             // Update instructions
             const instructions = document.querySelector('.instructions');
             if (currentLanguage === 'zh') {
-                instructions.textContent = '使用方向键或滑动来移动瓦片。合并瓦片以达到2048！';
+                instructions.textContent = '使用方向键、鼠标拖拽或滑动来移动瓦片。合并瓦片以达到2048！';
             } else {
-                instructions.textContent = 'Use arrow keys or swipe to move tiles. Combine tiles to reach 2048!';
+                instructions.textContent = 'Use arrow keys, mouse drag, or swipe to move tiles. Combine tiles to reach 2048!';
             }
         }
 
@@ -924,6 +921,9 @@
                 }
             });
 
+            // Mouse drag controls
+            setupMouseControls();
+
             // Button controls
             document.getElementById('newGame').addEventListener('click', async () => {
                 await game.new_game();
@@ -985,8 +985,90 @@
             });
         }
 
-        // Initialize the game when the page loads
-        initGame().catch(console.error);
+                    // Mouse drag controls setup
+            function setupMouseControls() {
+                let isDragging = false;
+                let startX, startY;
+                let dragThreshold = 30; // 最小拖拽距离
+                let gridElement = document.getElementById('grid');
+                
+                if (!gridElement) return;
+                
+                // 鼠标按下事件
+                gridElement.addEventListener('mousedown', (e) => {
+                    const state = game.get_state();
+                    if (state !== 'playing') return;
+                    
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    
+                    // 添加拖拽样式
+                    gridElement.style.cursor = 'grabbing';
+                    gridElement.style.userSelect = 'none';
+                });
+                
+                // 鼠标移动事件
+                document.addEventListener('mousemove', async (e) => {
+                    if (!isDragging) return;
+                    
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    
+                    // 只有当拖拽距离超过阈值时才执行移动
+                    if (distance > dragThreshold) {
+                        let direction = null;
+                        
+                        // 判断拖拽方向
+                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                            // 水平拖拽
+                            direction = deltaX > 0 ? 'right' : 'left';
+                        } else {
+                            // 垂直拖拽
+                            direction = deltaY > 0 ? 'down' : 'up';
+                        }
+                        
+                        if (direction) {
+                            try {
+                                await game.make_move(direction);
+                                await updateDisplay();
+                            } catch (error) {
+                                console.error('Move failed:', error);
+                            }
+                        }
+                        
+                        // 重置拖拽状态
+                        isDragging = false;
+                        gridElement.style.cursor = 'grab';
+                        gridElement.style.userSelect = 'auto';
+                    }
+                });
+                
+                // 鼠标松开事件
+                document.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        gridElement.style.cursor = 'grab';
+                        gridElement.style.userSelect = 'auto';
+                    }
+                });
+                
+                // 鼠标离开事件
+                document.addEventListener('mouseleave', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        gridElement.style.cursor = 'grab';
+                        gridElement.style.userSelect = 'auto';
+                    }
+                });
+                
+                // 设置初始光标样式
+                gridElement.style.cursor = 'grab';
+            }
+
+            // Initialize the game when the page loads
+            initGame().catch(console.error);
     </script>
 </body>
 </html>
