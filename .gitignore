@@ -25,3 +25,5 @@ cli/replays/replay*
 
 # Vercel
 .vercel
+
+node_modules

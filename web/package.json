@@ -1,23 +1,29 @@
 {
   "name": "rusty2048-web",
   "version": "0.1.0",
-  "description": "Web version of Rusty2048 game",
-  "main": "index.html",
+  "description": "Web version of Rusty2048 game with Pixi.js",
+  "type": "module",
   "scripts": {
-    "build": "./build.sh",
-    "serve": "cd dist && python3 -m http.server 8000",
-    "dev": "npm run build && npm run serve"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "wasm:build": "wasm-pack build ../web --target web --out-dir ../web/pkg"
   },
   "keywords": [
     "2048",
     "game",
     "rust",
     "wasm",
-    "web"
+    "web",
+    "pixi.js"
   ],
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
+    "vite": "^5.0.0",
     "wasm-pack": "^0.12.0"
+  },
+  "dependencies": {
+    "pixi.js": "^8.12.0"
   }
 }

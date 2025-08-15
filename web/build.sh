@@ -1,38 +1,17 @@
 #!/bin/bash
 
-# Build script for Rusty2048 Web version
+# 构建WASM
+echo "Building WASM..."
+cd ../core
+wasm-pack build --target web --out-dir ../web/pkg
+cd ../web
 
-set -e
-
-echo "🚀 Building Rusty2048 Web version..."
-
-# Check if wasm-pack is installed
-if ! command -v wasm-pack &> /dev/null; then
-    echo "❌ wasm-pack is not installed. Installing..."
-    cargo install wasm-pack
+# 安装依赖（如果还没有安装）
+if [ ! -d "node_modules" ]; then
+    echo "Installing dependencies..."
+    npm install
 fi
 
-# Build the WASM module
-echo "📦 Building WASM module..."
-wasm-pack build --target web --out-dir pkg
-
-# Create dist directory if it doesn't exist
-mkdir -p dist
-
-# Copy HTML and assets to dist
-echo "📁 Copying files to dist..."
-cp index.html dist/
-cp test-panic.html dist/
-cp -r pkg dist/
-
-# Create _headers file for Vercel
-echo "📝 Creating _headers file..."
-cat > dist/_headers << EOF
-/*.wasm
-  Content-Type: application/wasm
-EOF
-
-echo "✅ Build complete! Files are in the 'dist' directory."
-echo "🌐 To serve the web version, run:"
-echo "   cd dist && python3 -m http.server 8000"
-echo "   Then open http://localhost:8000 in your browser"
+# 启动开发服务器
+echo "Starting development server..."
+npm run dev

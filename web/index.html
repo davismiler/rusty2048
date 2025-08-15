@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rusty2048</title>
+    <title>Rusty2048 - Pixi.js Version</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -31,11 +31,11 @@
         /* 手机壳样式 */
         .phone-container {
             position: relative;
-            width: 450px;
-            height: 900px;
+            width: 640px;
+            height: 1200px;
             background: #1a1a1a;
-            border-radius: 45px;
-            padding: 25px;
+            border-radius: 60px;
+            padding: 30px;
             position: relative;
         }
 
@@ -44,7 +44,7 @@
             width: 100%;
             height: 100%;
             background: #faf8ef;
-            border-radius: 35px;
+            border-radius: 50px;
             overflow: hidden;
             position: relative;
             display: flex;
@@ -81,7 +81,7 @@
         .game-container {
             flex: 1;
             text-align: center;
-            padding: 25px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -133,12 +133,23 @@
         }
 
         .stat-box {
-            background: #bbada0;
+            background: linear-gradient(135deg, #bbada0 0%, #a89a8c 100%);
             padding: 15px 20px;
             border-radius: 14px;
             color: white;
             flex: 1;
             transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .stat-label {
@@ -154,22 +165,20 @@
             font-weight: bold;
         }
 
-        .grid {
-            background: #bbada0;
-            border-radius: 14px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0 auto 25px auto;
-            transition: all 0.3s ease;
-            width: fit-content;
-            cursor: grab;
-            user-select: none;
+        /* Canvas容器 */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
         }
 
-        .grid:active {
-            cursor: grabbing;
+        .canvas-container canvas {
+            border-radius: 12px;
         }
 
         /* 拖拽提示 */
@@ -178,52 +187,61 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: rgba(119, 110, 101, 0.3);
-            font-size: 14px;
+            color: rgba(119, 110, 101, 0.4);
+            font-size: 16px;
+            font-weight: 500;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: all 0.3s ease;
             opacity: 0;
+            z-index: 10;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
         }
 
-        .grid:hover .drag-hint {
-            opacity: 1;
+        /* 分数动画 */
+        .score-animation {
+            animation: score-pop 0.6s ease-out;
         }
 
-        .grid-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+        @keyframes score-pop {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+                color: #edc22e;
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
-        .grid-row:last-child {
-            margin-bottom: 0;
+        /* 游戏结束动画 */
+        .game-over-animation {
+            animation: game-over-shake 0.6s ease-in-out;
         }
 
-        .tile {
-            width: 72px;
-            height: 72px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            font-weight: bold;
-            color: #776e65;
-            background: #cdc1b4;
-            transition: all 0.15s ease;
+        @keyframes game-over-shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
 
-        .tile-2 { background: #eee4da; }
-        .tile-4 { background: #ede0c8; }
-        .tile-8 { background: #f2b179; color: #f9f6f2; }
-        .tile-16 { background: #f59563; color: #f9f6f2; }
-        .tile-32 { background: #f67c5f; color: #f9f6f2; }
-        .tile-64 { background: #f65e3b; color: #f9f6f2; }
-        .tile-128 { background: #edcf72; color: #f9f6f2; }
-        .tile-256 { background: #edcc61; color: #f9f6f2; }
-        .tile-512 { background: #edc850; color: #f9f6f2; }
-        .tile-1024 { background: #edc53f; color: #f9f6f2; }
-        .tile-2048 { background: #edc22e; color: #f9f6f2; }
+        /* 胜利动画 */
+        .win-animation {
+            animation: win-celebration 1s ease-in-out;
+        }
+
+        @keyframes win-celebration {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
 
         .controls {
             margin-bottom: 15px;
@@ -233,24 +251,41 @@
         }
 
         .btn {
-            background: #8f7a66;
+            background: linear-gradient(135deg, #8f7a66 0%, #7f6a56 100%);
             color: white;
             border: none;
             padding: 12px 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .btn:hover {
-            background: #7f6a56;
+            background: linear-gradient(135deg, #7f6a56 0%, #6f5a46 100%);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .btn:disabled {
-            background: #ccc;
+            background: linear-gradient(135deg, #ccc 0%, #bbb 100%);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .theme-selector {
@@ -272,23 +307,34 @@
         }
 
         .theme-btn {
-            background: #8f7a66;
+            background: linear-gradient(135deg, #8f7a66 0%, #7f6a56 100%);
             color: white;
             border: none;
             padding: 8px 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 11px;
             font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .theme-btn:hover {
-            background: #7f6a56;
+            background: linear-gradient(135deg, #7f6a56 0%, #6f5a46 100%);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .theme-btn.active {
-            background: #edc22e;
+            background: linear-gradient(135deg, #edc22e 0%, #f4d03f 100%);
+            box-shadow: 
+                0 4px 8px rgba(237, 194, 46, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .message {
@@ -388,21 +434,8 @@
                 font-size: 16px;
             }
             
-            .grid {
-                padding: 8px;
-                margin-bottom: 15px;
-            }
-            
-            .grid-row {
-                gap: 6px;
-                margin-bottom: 6px;
-            }
-            
-            .tile {
-                width: 80px;
-                height: 80px;
-                font-size: 26px;
-                border-radius: 6px;
+            .canvas-container {
+                margin: 0 auto 15px auto;
             }
             
             .controls {
@@ -453,14 +486,14 @@
         /* 中等屏幕设备 */
         @media (min-width: 481px) and (max-width: 768px) {
             .phone-container {
-                width: 360px;
-                height: 720px;
+                width: 480px;
+                height: 900px;
             }
             
-            .tile {
-                width: 66px;
-                height: 66px;
-                font-size: 24px;
+            .canvas-container {
+                width: 90%;
+                padding: 16px;
+                margin: 0 auto;
             }
             
             .title {
@@ -476,8 +509,8 @@
         /* 大屏幕设备 */
         @media (min-width: 769px) and (max-width: 1024px) {
             .phone-container {
-                width: 400px;
-                height: 850px;
+                width: 560px;
+                height: 1100px;
             }
         }
 
@@ -507,19 +540,8 @@
                 font-size: 14px;
             }
             
-            .tile {
-                width: 48px;
-                height: 48px;
-                font-size: 18px;
-            }
-            
-            .grid {
-                padding: 6px;
-            }
-            
-            .grid-row {
-                gap: 4px;
-                margin-bottom: 4px;
+            .canvas-container {
+                margin: 0 auto;
             }
             
             .controls {
@@ -559,10 +581,6 @@
             .stats {
                 width: 100%;
                 margin-bottom: 10px;
-            }
-            
-            .grid {
-                margin: 0 10px 10px 0;
             }
             
             .controls {
@@ -666,10 +684,7 @@
                     </div>
                 </div>
 
-                <div class="grid" id="grid">
-                    <!-- Grid will be generated by JavaScript -->
-                    <div class="drag-hint">拖拽移动</div>
-                </div>
+                <div class="canvas-container"></div>
 
                 <div class="message" id="message"></div>
 
@@ -697,378 +712,6 @@
         </div>
     </div>
 
-    <script type="module">
-        import init, { Rusty2048Web, init_panic_hook } from './pkg/rusty2048_web.js';
-
-        let game;
-        let currentTheme = 'Classic';
-        let currentLanguage = 'en';
-
-        // Initialize the game
-        async function initGame() {
-            await init();
-            // Set up panic hook for better error messages
-            init_panic_hook();
-            game = new Rusty2048Web();
-            
-            // Get current language from game
-            currentLanguage = game.get_language();
-            
-            await updateDisplay();
-            setupEventListeners();
-            updateLanguageDisplay();
-            
-            // Apply default theme
-            await applyTheme('Classic');
-        }
-
-        // Update the display
-        async function updateDisplay() {
-            await updateGrid();
-            await updateStats();
-            await updateMessage();
-            updateUndoButton();
-        }
-
-        // Update the game grid
-        async function updateGrid() {
-            const grid = document.getElementById('grid');
-            const board = await game.get_board();
-            
-            grid.innerHTML = '';
-            
-            for (let row = 0; row < 4; row++) {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'grid-row';
-                
-                for (let col = 0; col < 4; col++) {
-                    const tileDiv = document.createElement('div');
-                    const value = board[row * 4 + col];
-                    
-                    tileDiv.className = 'tile';
-                    if (value > 0) {
-                        tileDiv.textContent = value;
-                        tileDiv.classList.add(`tile-${value}`);
-                    }
-                    
-                    rowDiv.appendChild(tileDiv);
-                }
-                
-                grid.appendChild(rowDiv);
-            }
-        }
-
-        // Update statistics
-        async function updateStats() {
-            const score = await game.get_score();
-            document.getElementById('score').textContent = score.current;
-            document.getElementById('best').textContent = score.best;
-            document.getElementById('moves').textContent = game.get_moves();
-        }
-
-        // Update game message
-        async function updateMessage() {
-            const messageEl = document.getElementById('message');
-            const state = await game.get_state();
-            
-            messageEl.style.display = 'none';
-            messageEl.className = 'message';
-            
-            if (state === 'won') {
-                messageEl.textContent = '🎉 Congratulations! You won!';
-                messageEl.classList.add('won');
-                messageEl.style.display = 'block';
-            } else if (state === 'game_over') {
-                messageEl.textContent = '💀 Game Over!';
-                messageEl.classList.add('game-over');
-                messageEl.style.display = 'block';
-            }
-        }
-
-        // Update undo button state
-        function updateUndoButton() {
-            // For now, always enable the undo button
-            // The actual undo availability will be checked when the button is clicked
-            const undoBtn = document.getElementById('undo');
-            undoBtn.disabled = false;
-        }
-
-        // Toggle language
-        async function toggleLanguage() {
-            const languages = ['en', 'zh'];
-            const currentIndex = languages.indexOf(currentLanguage);
-            const nextIndex = (currentIndex + 1) % languages.length;
-            const newLanguage = languages[nextIndex];
-            
-            await game.set_language(newLanguage);
-            currentLanguage = newLanguage;
-            
-            updateLanguageDisplay();
-            updateTranslations();
-        }
-
-        // Update language display
-        function updateLanguageDisplay() {
-            const langBtn = document.getElementById('languageToggle');
-            const langNames = { 'en': 'English', 'zh': '中文' };
-            langBtn.textContent = langNames[currentLanguage] || 'Language';
-        }
-
-        // Update translations
-        function updateTranslations() {
-            // Update stat labels
-            document.querySelector('.stat-box:nth-child(1) .stat-label').textContent = game.get_translation('score');
-            document.querySelector('.stat-box:nth-child(2) .stat-label').textContent = game.get_translation('best');
-            document.querySelector('.stat-box:nth-child(3) .stat-label').textContent = game.get_translation('moves');
-            
-            // Update button texts
-            document.getElementById('newGame').textContent = game.get_translation('new_game');
-            document.getElementById('undo').textContent = game.get_translation('undo');
-            
-            // Update instructions
-            const instructions = document.querySelector('.instructions');
-            if (currentLanguage === 'zh') {
-                instructions.textContent = '使用方向键、鼠标拖拽或滑动来移动瓦片。合并瓦片以达到2048！';
-            } else {
-                instructions.textContent = 'Use arrow keys, mouse drag, or swipe to move tiles. Combine tiles to reach 2048!';
-            }
-        }
-
-        // Apply theme
-        async function applyTheme(themeName) {
-            try {
-                await game.set_theme(themeName);
-                currentTheme = themeName;
-                
-                // Update theme buttons
-                document.querySelectorAll('.theme-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.querySelector(`[data-theme="${themeName}"]`).classList.add('active');
-                
-                // Apply theme colors
-                const theme = game.get_theme();
-                document.body.style.backgroundColor = theme.background;
-                document.querySelector('.title').style.color = theme.title_color;
-                document.querySelector('.instructions').style.color = theme.text_color;
-                document.querySelector('.grid').style.backgroundColor = theme.grid_background;
-                
-                // Update stat boxes
-                document.querySelectorAll('.stat-box').forEach(box => {
-                    box.style.backgroundColor = theme.grid_background;
-                });
-                
-                // Update tiles
-                updateTileColors(theme);
-            } catch (error) {
-                console.error('Error applying theme:', error);
-            }
-        }
-
-        // Update tile colors based on theme
-        function updateTileColors(theme) {
-            const tiles = document.querySelectorAll('.tile');
-            tiles.forEach((tile, index) => {
-                const value = parseInt(tile.textContent) || 0;
-                const colorIndex = value === 0 ? 0 : Math.min(Math.log2(value), theme.tile_colors.length - 1);
-                tile.style.backgroundColor = theme.tile_colors[colorIndex];
-                
-                // Calculate text color based on background brightness
-                const hex = theme.tile_colors[colorIndex];
-                const r = parseInt(hex.slice(1, 3), 16);
-                const g = parseInt(hex.slice(3, 5), 16);
-                const b = parseInt(hex.slice(5, 7), 16);
-                const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-                tile.style.color = luminance > 0.5 ? '#776e65' : '#f9f6f2';
-            });
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Keyboard controls
-            document.addEventListener('keydown', async (e) => {
-                const state = await game.get_state();
-                if (state !== 'playing') return;
-                
-                let direction = null;
-                switch (e.key) {
-                    case 'ArrowUp':
-                    case 'w':
-                    case 'W':
-                        direction = 'up';
-                        break;
-                    case 'ArrowDown':
-                    case 's':
-                    case 'S':
-                        direction = 'down';
-                        break;
-                    case 'ArrowLeft':
-                    case 'a':
-                    case 'A':
-                        direction = 'left';
-                        break;
-                    case 'ArrowRight':
-                    case 'd':
-                    case 'D':
-                        direction = 'right';
-                        break;
-                }
-                
-                if (direction) {
-                    e.preventDefault();
-                    await game.make_move(direction);
-                    await updateDisplay();
-                }
-            });
-
-            // Mouse drag controls
-            setupMouseControls();
-
-            // Button controls
-            document.getElementById('newGame').addEventListener('click', async () => {
-                await game.new_game();
-                await updateDisplay();
-            });
-
-            document.getElementById('undo').addEventListener('click', async () => {
-                await game.undo();
-                await updateDisplay();
-            });
-
-            // Language toggle
-            document.getElementById('languageToggle').addEventListener('click', async () => {
-                await toggleLanguage();
-            });
-
-            // Theme controls
-            document.querySelectorAll('.theme-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const themeName = btn.getAttribute('data-theme');
-                    await applyTheme(themeName);
-                });
-            });
-
-            // Touch/swipe support for mobile
-            let startX, startY;
-            document.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-            });
-
-            document.addEventListener('touchend', async (e) => {
-                if (!startX || !startY) return;
-                
-                const endX = e.changedTouches[0].clientX;
-                const endY = e.changedTouches[0].clientY;
-                
-                const diffX = startX - endX;
-                const diffY = startY - endY;
-                
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // Horizontal swipe
-                    if (diffX > 0) {
-                        await game.make_move('left');
-                    } else {
-                        await game.make_move('right');
-                    }
-                } else {
-                    // Vertical swipe
-                    if (diffY > 0) {
-                        await game.make_move('up');
-                    } else {
-                        await game.make_move('down');
-                    }
-                }
-                
-                await updateDisplay();
-                startX = startY = null;
-            });
-        }
-
-                    // Mouse drag controls setup
-            function setupMouseControls() {
-                let isDragging = false;
-                let startX, startY;
-                let dragThreshold = 30; // 最小拖拽距离
-                let gridElement = document.getElementById('grid');
-                
-                if (!gridElement) return;
-                
-                // 鼠标按下事件
-                gridElement.addEventListener('mousedown', (e) => {
-                    const state = game.get_state();
-                    if (state !== 'playing') return;
-                    
-                    isDragging = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    
-                    // 添加拖拽样式
-                    gridElement.style.cursor = 'grabbing';
-                    gridElement.style.userSelect = 'none';
-                });
-                
-                // 鼠标移动事件
-                document.addEventListener('mousemove', async (e) => {
-                    if (!isDragging) return;
-                    
-                    const deltaX = e.clientX - startX;
-                    const deltaY = e.clientY - startY;
-                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    
-                    // 只有当拖拽距离超过阈值时才执行移动
-                    if (distance > dragThreshold) {
-                        let direction = null;
-                        
-                        // 判断拖拽方向
-                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                            // 水平拖拽
-                            direction = deltaX > 0 ? 'right' : 'left';
-                        } else {
-                            // 垂直拖拽
-                            direction = deltaY > 0 ? 'down' : 'up';
-                        }
-                        
-                        if (direction) {
-                            try {
-                                await game.make_move(direction);
-                                await updateDisplay();
-                            } catch (error) {
-                                console.error('Move failed:', error);
-                            }
-                        }
-                        
-                        // 重置拖拽状态
-                        isDragging = false;
-                        gridElement.style.cursor = 'grab';
-                        gridElement.style.userSelect = 'auto';
-                    }
-                });
-                
-                // 鼠标松开事件
-                document.addEventListener('mouseup', () => {
-                    if (isDragging) {
-                        isDragging = false;
-                        gridElement.style.cursor = 'grab';
-                        gridElement.style.userSelect = 'auto';
-                    }
-                });
-                
-                // 鼠标离开事件
-                document.addEventListener('mouseleave', () => {
-                    if (isDragging) {
-                        isDragging = false;
-                        gridElement.style.cursor = 'grab';
-                        gridElement.style.userSelect = 'auto';
-                    }
-                });
-                
-                // 设置初始光标样式
-                gridElement.style.cursor = 'grab';
-            }
-
-            // Initialize the game when the page loads
-            initGame().catch(console.error);
-    </script>
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>
