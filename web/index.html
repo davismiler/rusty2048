@@ -27,11 +27,11 @@
         /* 手机壳样式 */
         .phone-container {
             position: relative;
-            width: 375px;
-            height: 812px;
+            width: 450px;
+            height: 900px;
             background: #1a1a1a;
-            border-radius: 40px;
-            padding: 20px;
+            border-radius: 45px;
+            padding: 25px;
             box-shadow: 
                 0 0 0 8px #2a2a2a,
                 0 0 0 12px #3a3a3a,
@@ -45,7 +45,7 @@
             width: 100%;
             height: 100%;
             background: #faf8ef;
-            border-radius: 30px;
+            border-radius: 35px;
             overflow: hidden;
             position: relative;
             display: flex;
@@ -82,7 +82,7 @@
         .game-container {
             flex: 1;
             text-align: center;
-            padding: 20px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -94,10 +94,10 @@
         }
 
         .title {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: bold;
             color: #776e65;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             transition: color 0.3s ease;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
@@ -107,8 +107,8 @@
             position: absolute;
             top: 0;
             right: 0;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, #333 0%, #666 100%);
             border-radius: 50%;
             display: flex;
@@ -127,7 +127,7 @@
         }
 
         .github-link i {
-            font-size: 18px;
+            font-size: 20px;
         }
 
         .stats {
@@ -139,8 +139,8 @@
 
         .stat-box {
             background: linear-gradient(135deg, #bbada0 0%, #a89a8c 100%);
-            padding: 12px 16px;
-            border-radius: 12px;
+            padding: 15px 20px;
+            border-radius: 14px;
             color: white;
             flex: 1;
             transition: all 0.3s ease;
@@ -154,33 +154,36 @@
         }
 
         .stat-label {
-            font-size: 11px;
+            font-size: 12px;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             opacity: 0.9;
             font-weight: 600;
         }
 
         .stat-value {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
         }
 
         .grid {
             background: linear-gradient(135deg, #bbada0 0%, #a89a8c 100%);
-            border-radius: 12px;
-            padding: 12px;
-            display: inline-block;
-            margin-bottom: 20px;
+            border-radius: 14px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto 25px auto;
             transition: all 0.3s ease;
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             border: 2px solid rgba(255,255,255,0.1);
+            width: fit-content;
         }
 
         .grid-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .grid-row:last-child {
@@ -188,13 +191,13 @@
         }
 
         .tile {
-            width: 60px;
-            height: 60px;
+            width: 72px;
+            height: 72px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 22px;
             font-weight: bold;
             color: #776e65;
             background: #cdc1b4;
@@ -226,10 +229,10 @@
             background: linear-gradient(135deg, #8f7a66 0%, #7f6a56 100%);
             color: white;
             border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -271,10 +274,10 @@
             background: linear-gradient(135deg, #8f7a66 0%, #7f6a56 100%);
             color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -312,9 +315,9 @@
         }
 
         .instructions {
-            font-size: 11px;
+            font-size: 12px;
             color: #776e65;
-            margin-top: 10px;
+            margin-top: 15px;
             transition: color 0.3s ease;
             line-height: 1.4;
             opacity: 0.8;
@@ -322,40 +325,269 @@
 
         /* 响应式设计 */
         @media (max-width: 480px) {
+            body {
+                padding: 0;
+                background: #faf8ef;
+            }
+            
             .phone-container {
                 width: 100%;
                 height: 100vh;
                 border-radius: 0;
-                padding: 10px;
+                padding: 0;
+                box-shadow: none;
+                background: transparent;
+            }
+            
+            .phone-container::before,
+            .phone-container::after {
+                display: none;
             }
             
             .phone-screen {
-                border-radius: 20px;
+                border-radius: 0;
+                background: #faf8ef;
             }
             
-            .tile {
-                width: 50px;
-                height: 50px;
-                font-size: 16px;
+            .status-bar {
+                height: 20px;
+                padding: 0 15px;
+                font-size: 12px;
+            }
+            
+            .game-container {
+                padding: 15px;
+                justify-content: flex-start;
             }
             
             .title {
-                font-size: 28px;
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+            
+            .github-link {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .github-link i {
+                font-size: 14px;
             }
             
             .stats {
-                flex-direction: column;
+                flex-direction: row;
                 gap: 8px;
+                margin-bottom: 15px;
+            }
+            
+            .stat-box {
+                padding: 8px 12px;
+            }
+            
+            .stat-label {
+                font-size: 10px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+            
+            .grid {
+                padding: 8px;
+                margin-bottom: 15px;
+            }
+            
+            .grid-row {
+                gap: 6px;
+                margin-bottom: 6px;
+            }
+            
+            .tile {
+                width: 80px;
+                height: 80px;
+                font-size: 20px;
+                border-radius: 6px;
+            }
+            
+            .controls {
+                flex-direction: row;
+                gap: 6px;
+                margin-bottom: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 11px;
+                flex: 1;
+                min-width: 80px;
+                max-width: none;
+            }
+            
+            .theme-selector {
+                margin-bottom: 12px;
+            }
+            
+            .theme-label {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+            
+            .theme-buttons {
+                gap: 4px;
+            }
+            
+            .theme-btn {
+                padding: 4px 8px;
+                font-size: 9px;
+            }
+            
+            .instructions {
+                font-size: 10px;
+                margin-top: 8px;
+            }
+            
+            .message {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+
+        /* 中等屏幕设备 */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .phone-container {
+                width: 360px;
+                height: 720px;
+            }
+            
+            .tile {
+                width: 66px;
+                height: 66px;
+                font-size: 19px;
+            }
+            
+            .title {
+                font-size: 30px;
+            }
+            
+            .btn {
+                padding: 8px 14px;
+                font-size: 11px;
+            }
+        }
+
+        /* 大屏幕设备 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .phone-container {
+                width: 400px;
+                height: 850px;
+            }
+        }
+
+        /* 超小屏幕设备 */
+        @media (max-width: 360px) {
+            .game-container {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 20px;
+            }
+            
+            .stats {
+                gap: 6px;
+            }
+            
+            .stat-box {
+                padding: 6px 8px;
+            }
+            
+            .stat-label {
+                font-size: 9px;
+            }
+            
+            .stat-value {
+                font-size: 14px;
+            }
+            
+            .tile {
+                width: 48px;
+                height: 48px;
+                font-size: 14px;
+            }
+            
+            .grid {
+                padding: 6px;
+            }
+            
+            .grid-row {
+                gap: 4px;
+                margin-bottom: 4px;
+            }
+            
+            .controls {
+                gap: 4px;
+            }
+            
+            .btn {
+                padding: 6px 8px;
+                font-size: 10px;
+                min-width: 60px;
+            }
+            
+            .theme-btn {
+                padding: 3px 6px;
+                font-size: 8px;
+            }
+        }
+
+        /* 横屏模式优化 */
+        @media (max-width: 480px) and (orientation: landscape) {
+            .phone-container {
+                height: 100vh;
+            }
+            
+            .game-container {
+                padding: 10px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+            
+            .header {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .stats {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .grid {
+                margin: 0 10px 10px 0;
             }
             
             .controls {
                 flex-direction: column;
-                align-items: center;
+                gap: 4px;
+                margin-bottom: 10px;
             }
             
             .btn {
-                width: 100%;
-                max-width: 200px;
+                padding: 6px 10px;
+                font-size: 10px;
+                min-width: 70px;
+            }
+            
+            .theme-selector {
+                margin-bottom: 10px;
+            }
+            
+            .instructions {
+                font-size: 9px;
+                margin-top: 5px;
             }
         }
 
