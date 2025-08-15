@@ -29,6 +29,11 @@ print_error() {
     echo -e "${RED}❌${NC} $1"
 }
 
+# Function to check if command exists
+command_exists() {
+    command -v "$1" &> /dev/null
+}
+
 # Function to check if binary exists
 binary_exists() {
     [ -f "$1" ]
@@ -50,26 +55,53 @@ run_cli() {
     fi
 }
 
-# Function to run Web version
+# Function to run Web version (development)
 run_web() {
-    print_status "Starting Web version..."
+    print_status "Starting Web version (development mode)..."
     
-    # Check if web dist exists
-    if [ -d "web/dist" ]; then
-        print_success "Serving Web version..."
-        echo "🌐 Web version will be available at: http://localhost:8000"
-        echo "   Press Ctrl+C to stop the server"
-        echo ""
-        cd web/dist && python3 -m http.server 8000
-    else
+    # Check if npm is installed
+    if ! command_exists npm; then
+        print_error "npm is not installed. Please install Node.js and npm first."
+        exit 1
+    fi
+    
+    # Navigate to web directory
+    cd web
+    
+    # Install dependencies if needed
+    if [ ! -d "node_modules" ]; then
+        print_status "Installing npm dependencies..."
+        npm install
+    fi
+    
+    # Check if WASM module exists, build if not
+    if [ ! -d "pkg" ] || [ ! -f "pkg/rusty2048_web.js" ]; then
+        print_warning "WASM module not found. Building first..."
+        wasm-pack build --target web --out-dir pkg
+    fi
+    
+    print_success "Starting Vite development server..."
+    echo "🌐 Web version will be available at: http://localhost:5173"
+    echo "   Press Ctrl+C to stop the server"
+    echo ""
+    npm run dev
+}
+
+# Function to run Web version (production)
+run_web_prod() {
+    print_status "Starting Web version (production mode)..."
+    
+    # Check if web dist exists, build if not
+    if [ ! -d "web/dist" ]; then
         print_warning "Web dist not found. Building first..."
         ./build.sh web
-        print_success "Serving Web version..."
-        echo "🌐 Web version will be available at: http://localhost:8000"
-        echo "   Press Ctrl+C to stop the server"
-        echo ""
-        cd web/dist && python3 -m http.server 8000
     fi
+    
+    print_success "Serving production Web version..."
+    echo "🌐 Web version will be available at: http://localhost:8000"
+    echo "   Press Ctrl+C to stop the server"
+    echo ""
+    cd web/dist && python3 -m http.server 8000
 }
 
 # Function to run Desktop version
@@ -106,13 +138,15 @@ show_usage() {
     echo ""
     echo "Options:"
     echo "  cli       Run CLI version"
-    echo "  web       Run Web version (serves on localhost:8000)"
+    echo "  web       Run Web version (development server on localhost:5173)"
+    echo "  web:prod  Run Web version (production build on localhost:8000)"
     echo "  desktop   Run Desktop version"
     echo "  help      Show this help message"
     echo ""
     echo "Examples:"
     echo "  $0 cli      # Run CLI version"
-    echo "  $0 web      # Run Web version"
+    echo "  $0 web      # Run Web version (dev mode)"
+    echo "  $0 web:prod # Run Web version (production)"
     echo "  $0 desktop  # Run Desktop version"
     echo ""
     echo "Note: If the version is not built, it will be built automatically."
@@ -137,6 +171,9 @@ main() {
             ;;
         "web")
             run_web
+            ;;
+        "web:prod")
+            run_web_prod
             ;;
         "desktop")
             run_desktop

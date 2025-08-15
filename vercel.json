@@ -16,6 +16,6 @@
       "dest": "/web/dist/$1"
     }
   ],
-  "buildCommand": "cd web && ./build.sh",
+  "buildCommand": "./build.sh web",
   "outputDirectory": "web/dist"
 }

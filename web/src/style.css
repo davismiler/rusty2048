@@ -1,0 +1,637 @@
+/* 重置和基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #667eea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition: background-color 0.3s ease;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* 手机壳样式 */
+.phone-container {
+    position: relative;
+    width: 640px;
+    height: 1200px;
+    background: #1a1a1a;
+    border-radius: 60px;
+    padding: 30px;
+    position: relative;
+}
+
+/* 手机屏幕 */
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background: #faf8ef;
+    border-radius: 50px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s ease;
+}
+
+/* 状态栏 */
+.status-bar {
+    height: 44px;
+    background: rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #776e65;
+}
+
+.status-left {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 主内容区域 */
+.game-container {
+    flex: 1;
+    text-align: center;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    animation: slideIn 0.5s ease-out;
+}
+
+.header {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.title {
+    font-size: 42px;
+    font-weight: bold;
+    color: #776e65;
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
+
+/* GitHub图标 */
+.github-link {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 45px;
+    height: 45px;
+    background: #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.github-link:hover {
+    background: #24292e;
+}
+
+.github-link i {
+    font-size: 20px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, #bbada0 0%, #a89a8c 100%);
+    padding: 15px 20px;
+    border-radius: 14px;
+    color: white;
+    flex: 1;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 6px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.stat-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Canvas容器 */
+.canvas-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+}
+
+.canvas-container canvas {
+    border-radius: 12px;
+}
+
+/* 拖拽提示 */
+.drag-hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(119, 110, 101, 0.4);
+    font-size: 16px;
+    font-weight: 500;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    opacity: 0;
+    z-index: 10;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: none;
+}
+
+/* 分数动画 */
+.score-animation {
+    animation: score-pop 0.6s ease-out;
+}
+
+@keyframes score-pop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+        color: #edc22e;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 游戏结束动画 */
+.game-over-animation {
+    animation: game-over-shake 0.6s ease-in-out;
+}
+
+@keyframes game-over-shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* 胜利动画 */
+.win-animation {
+    animation: win-celebration 1s ease-in-out;
+}
+
+@keyframes win-celebration {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.controls {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn {
+    background: linear-gradient(135deg, #8f7a66 0%, #7f6a56 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #7f6a56 0%, #6f5a46 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 6px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn:disabled {
+    background: linear-gradient(135deg, #ccc 0%, #bbb 100%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-selector {
+    margin-bottom: 15px;
+}
+
+.theme-label {
+    font-size: 12px;
+    color: #776e65;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.theme-buttons {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.theme-btn {
+    background: linear-gradient(135deg, #8f7a66 0%, #7f6a56 100%);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.theme-btn:hover {
+    background: linear-gradient(135deg, #7f6a56 0%, #6f5a46 100%);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.theme-btn.active {
+    background: linear-gradient(135deg, #edc22e 0%, #f4d03f 100%);
+    box-shadow: 
+        0 4px 8px rgba(237, 194, 46, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.message {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    display: none;
+}
+
+.message.won {
+    background: #edc22e;
+    color: #f9f6f2;
+}
+
+.message.game-over {
+    background: #f65e3b;
+    color: #f9f6f2;
+}
+
+.instructions {
+    font-size: 12px;
+    color: #776e65;
+    margin-top: 15px;
+    transition: color 0.3s ease;
+    line-height: 1.4;
+    opacity: 0.8;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+        background: #faf8ef;
+    }
+    
+    .phone-container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+        background: transparent;
+    }
+    
+    .phone-container::before,
+    .phone-container::after {
+        display: none;
+    }
+    
+    .phone-screen {
+        border-radius: 0;
+        background: #faf8ef;
+    }
+    
+    .status-bar {
+        height: 20px;
+        padding: 0 15px;
+        font-size: 12px;
+    }
+    
+    .game-container {
+        padding: 15px;
+        justify-content: flex-start;
+    }
+    
+    .title {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+    
+    .github-link {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .github-link i {
+        font-size: 14px;
+    }
+    
+    .stats {
+        flex-direction: row;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .stat-box {
+        padding: 8px 12px;
+    }
+    
+    .stat-label {
+        font-size: 10px;
+    }
+    
+    .stat-value {
+        font-size: 16px;
+    }
+    
+    .canvas-container {
+        margin: 0 auto 15px auto;
+    }
+    
+    .controls {
+        flex-direction: row;
+        gap: 6px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .btn {
+        padding: 8px 12px;
+        font-size: 11px;
+        flex: 1;
+        min-width: 80px;
+        max-width: none;
+    }
+    
+    .theme-selector {
+        margin-bottom: 12px;
+    }
+    
+    .theme-label {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+    
+    .theme-buttons {
+        gap: 4px;
+    }
+    
+    .theme-btn {
+        padding: 4px 8px;
+        font-size: 9px;
+    }
+    
+    .instructions {
+        font-size: 10px;
+        margin-top: 8px;
+    }
+    
+    .message {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+/* 中等屏幕设备 */
+@media (min-width: 481px) and (max-width: 768px) {
+    .phone-container {
+        width: 480px;
+        height: 900px;
+    }
+    
+    .canvas-container {
+        width: 90%;
+        padding: 16px;
+        margin: 0 auto;
+    }
+    
+    .title {
+        font-size: 30px;
+    }
+    
+    .btn {
+        padding: 8px 14px;
+        font-size: 11px;
+    }
+}
+
+/* 大屏幕设备 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .phone-container {
+        width: 560px;
+        height: 1100px;
+    }
+}
+
+/* 超小屏幕设备 */
+@media (max-width: 360px) {
+    .game-container {
+        padding: 10px;
+    }
+    
+    .title {
+        font-size: 20px;
+    }
+    
+    .stats {
+        gap: 6px;
+    }
+    
+    .stat-box {
+        padding: 6px 8px;
+    }
+    
+    .stat-label {
+        font-size: 9px;
+    }
+    
+    .stat-value {
+        font-size: 14px;
+    }
+    
+    .canvas-container {
+        margin: 0 auto;
+    }
+    
+    .controls {
+        gap: 4px;
+    }
+    
+    .btn {
+        padding: 6px 8px;
+        font-size: 10px;
+        min-width: 60px;
+    }
+    
+    .theme-btn {
+        padding: 3px 6px;
+        font-size: 8px;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-width: 480px) and (orientation: landscape) {
+    .phone-container {
+        height: 100vh;
+    }
+    
+    .game-container {
+        padding: 10px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+    
+    .header {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .stats {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 10px;
+    }
+    
+    .btn {
+        padding: 6px 10px;
+        font-size: 10px;
+        min-width: 70px;
+    }
+    
+    .theme-selector {
+        margin-bottom: 10px;
+    }
+    
+    .instructions {
+        font-size: 9px;
+        margin-top: 5px;
+    }
+}
+
+/* 动画效果 */
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 手机壳装饰 */
+.phone-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -1px;
+    width: 2px;
+    height: 50px;
+    background: #2a2a2a;
+    border-radius: 1px;
+    transform: translateY(-50%);
+}
+
+.phone-container::after {
+    content: '';
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    width: 50px;
+    height: 2px;
+    background: #2a2a2a;
+    border-radius: 1px;
+    transform: translateX(-50%);
+}
