@@ -16,6 +16,6 @@
       "dest": "/web/dist/$1"
     }
   ],
-  "buildCommand": "./build.sh web",
+  "buildCommand": "cd web && npm install && npm run build",
   "outputDirectory": "web/dist"
 }
