@@ -77,6 +77,7 @@ impl ThemeManager {
     }
     
     /// Switch to previous theme
+    #[allow(dead_code)]
     pub fn prev_theme(&mut self) {
         self.current_index = if self.current_index == 0 {
             self.themes.len() - 1
@@ -103,6 +104,7 @@ impl ThemeManager {
     }
     
     /// Get all theme names
+    #[allow(dead_code)]
     pub fn theme_names(&self) -> Vec<&str> {
         self.themes.iter().map(|t| t.name.as_str()).collect()
     }

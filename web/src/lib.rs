@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 use rusty2048_core::{Game, GameConfig, Direction, GameState};
 use rusty2048_shared::{I18n, Language, TranslationKey};
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -159,7 +159,7 @@ impl Rusty2048Web {
 
     /// Get current theme information
     pub fn get_theme(&self) -> JsValue {
-        #[derive(serde::Serialize)]
+        #[derive(Serialize)]
         struct Theme {
             background: String,
             title_color: String,

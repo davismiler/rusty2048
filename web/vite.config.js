@@ -8,12 +8,12 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['../pkg/rusty2048_web.js']
+    exclude: ['../public/pkg/rusty2048_web.js']
   },
   build: {
     target: 'esnext',
     rollupOptions: {
-      external: ['../pkg/rusty2048_web.js']
+      external: ['../public/pkg/rusty2048_web.js']
     }
   }
 })

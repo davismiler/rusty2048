@@ -23,3 +23,8 @@ serde_json.workspace = true
 serde-wasm-bindgen = "0.6"
 getrandom = { version = "0.2", features = ["js"] }
 console_error_panic_hook = "0.1"
+wee_alloc = { version = "0.4", optional = true }
+
+[features]
+default = []
+wee_alloc = ["dep:wee_alloc"]

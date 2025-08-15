@@ -1,4 +1,4 @@
-use rusty2048_core::{StatisticsManager, StatisticsSummary};
+use rusty2048_core::StatisticsManager;
 use ratatui::{
     layout::{Constraint, Direction as LayoutDirection, Layout, Rect},
     style::{Color, Modifier, Style},
@@ -6,7 +6,7 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph, Row, Table},
     Frame,
 };
-use std::collections::HashMap;
+
 
 /// Chart display mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

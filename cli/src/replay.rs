@@ -1,16 +1,13 @@
 use rusty2048_core::{ReplayRecorder, ReplayPlayer, ReplayData, ReplayMetadata, GameConfig, Direction};
-use rusty2048_shared::Theme;
+
 use crate::theme::ThemeManager;
 
 const REPLAY_DIR: &str = "replays";
 use crossterm::{
-    cursor,
-    event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
-    execute,
-    terminal::{self, Clear, ClearType},
+    event::{self, Event, KeyCode, KeyEvent},
 };
 use ratatui::{
-    backend::CrosstermBackend,
+
     layout::{Constraint, Direction as LayoutDirection, Layout},
     style::{Color, Modifier, Style},
     text::{Span, Line},
@@ -20,8 +17,7 @@ use ratatui::{
 use serde_json;
 use std::{
     fs,
-    io::{self, Write},
-    path::Path,
+    io,
     time::{Duration, Instant},
 };
 
@@ -300,7 +296,7 @@ impl ReplayMode {
                     KeyCode::Up | KeyCode::Char('w') | KeyCode::Char('W') => {
                         let _ = recorder.make_move(Direction::Up);
                     }
-                    KeyCode::Down | KeyCode::Char('s') | KeyCode::Char('S') => {
+                    KeyCode::Down | KeyCode::Char('S') => {
                         let _ = recorder.make_move(Direction::Down);
                     }
                     KeyCode::Left | KeyCode::Char('a') | KeyCode::Char('A') => {
@@ -345,6 +341,7 @@ impl ReplayMode {
     }
     
     /// Show save success message
+    #[allow(dead_code)]
     fn show_save_success<B: ratatui::backend::Backend>(&self, filename: &str, terminal: &mut Terminal<B>) -> io::Result<()> {
         
         terminal.draw(|f| {
@@ -646,6 +643,7 @@ impl ReplayMode {
     }
     
     /// Render game board
+    #[allow(dead_code)]
     fn render_game_board(
         &self,
         f: &mut ratatui::Frame,

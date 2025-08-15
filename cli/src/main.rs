@@ -1,10 +1,10 @@
-use rusty2048_core::{Game, GameConfig, Direction, GameState, GameStats, AIGameController, AIAlgorithm};
+use rusty2048_core::{Game, GameConfig, Direction, GameState, AIGameController, AIAlgorithm};
 use ratatui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction as LayoutDirection, Layout, Rect},
+    layout::{Constraint, Direction as LayoutDirection, Layout},
     style::{Color, Modifier, Style},
     text::{Span, Line},
-    widgets::{Block, Borders, Paragraph, Clear},
+    widgets::{Block, Borders, Paragraph},
     Terminal,
 };
 
@@ -21,7 +21,6 @@ use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-    cursor,
 };
 use std::{io, panic};
 
@@ -311,7 +310,7 @@ fn run_game<B: ratatui::backend::Backend>(
                     
                     // Add final statistics
                     let final_score = game.score().current();
-                    let best_score = game.score().best();
+                    let _best_score = game.score().best();
                     let total_moves = game.moves();
                     let max_tile = game.board().max_tile();
                     
@@ -600,13 +599,13 @@ fn run_game<B: ratatui::backend::Backend>(
                             ai_speed = (ai_speed + 100).min(2000);
                         }
                     }
-                    KeyCode::Left => {
+                    KeyCode::Char('x') => {
                         // Previous chart mode
                         if show_charts {
                             charts_display.prev_mode();
                         }
                     }
-                    KeyCode::Right => {
+                    KeyCode::Char('z') => {
                         // Next chart mode
                         if show_charts {
                             charts_display.next_mode();

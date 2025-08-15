@@ -346,6 +346,7 @@ impl AIPlayer {
 
 /// MCTS Node for Monte Carlo Tree Search
 struct MCTSNode {
+    #[allow(dead_code)]
     game: Game,
     children: Vec<MCTSNode>,
     visits: usize,

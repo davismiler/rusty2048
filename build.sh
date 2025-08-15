@@ -73,7 +73,13 @@ build_web() {
     
     # Build the WASM module
     print_status "Building WASM module..."
-    wasm-pack build --target web --out-dir pkg
+    wasm-pack build --target web --out-dir public/pkg
+    
+    # Remove .gitignore file if it exists
+    if [ -f "public/pkg/.gitignore" ]; then
+        print_status "Removing .gitignore file..."
+        rm public/pkg/.gitignore
+    fi
     
     # Build the web application with Vite
     print_status "Building web application with Vite..."

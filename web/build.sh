@@ -58,7 +58,13 @@ build_web() {
     
     # Build the WASM module
     print_status "Building WASM module..."
-    wasm-pack build --target web --out-dir pkg
+    wasm-pack build --target web --out-dir public/pkg
+    
+    # Remove .gitignore file if it exists
+    if [ -f "public/pkg/.gitignore" ]; then
+        print_status "Removing .gitignore file..."
+        rm public/pkg/.gitignore
+    fi
     
     # Build the web application with Vite
     print_status "Building web application with Vite..."
@@ -87,9 +93,15 @@ dev_server() {
     fi
     
     # Check if WASM module exists, build if not
-    if [ ! -d "pkg" ] || [ ! -f "pkg/rusty2048_web.js" ]; then
+    if [ ! -d "public/pkg" ] || [ ! -f "public/pkg/rusty2048_web.js" ]; then
         print_warning "WASM module not found. Building first..."
-        wasm-pack build --target web --out-dir pkg
+        wasm-pack build --target web --out-dir public/pkg
+        
+        # Remove .gitignore file if it exists
+        if [ -f "public/pkg/.gitignore" ]; then
+            print_status "Removing .gitignore file..."
+            rm public/pkg/.gitignore
+        fi
     fi
     
     print_success "Starting Vite development server..."

@@ -39,11 +39,13 @@ impl LanguageManager {
     }
     
     /// Get translation with parameters
+    #[allow(dead_code)]
     pub fn t_with_params(&self, key: &TranslationKey, params: &[(&str, &str)]) -> String {
         self.i18n.t_with_params(key, params)
     }
     
     /// Format duration
+    #[allow(dead_code)]
     pub fn format_duration(&self, seconds: u64) -> String {
         self.i18n.format_duration(seconds)
     }
@@ -62,6 +64,7 @@ impl LanguageManager {
     }
     
     /// Cycle to previous language
+    #[allow(dead_code)]
     pub fn prev_language(&mut self) {
         let languages = self.supported_languages();
         let current_index = languages.iter().position(|&l| l == self.current_language()).unwrap_or(0);
