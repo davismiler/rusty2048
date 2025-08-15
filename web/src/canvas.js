@@ -138,6 +138,8 @@ export class CanvasManager {
         }
 
         // 2) 下一帧：滑动到新位置；合并来源收拢；目标弹一下；新生弹入
+        const animationStart = performance.now();
+        
         requestAnimationFrame(() => {
             for (const t of tiles) {
                 const spr = spritesById.get(t.id);
@@ -166,7 +168,16 @@ export class CanvasManager {
                 if (t.isNew) this.scaleIn(spr, this.animationDuration * 0.8);
             }
 
-            setTimeout(() => { this.isAnimating = false; }, this.animationDuration + 20);
+            // 使用requestAnimationFrame检测动画结束
+            const checkAnimationEnd = () => {
+                const elapsed = performance.now() - animationStart;
+                if (elapsed >= this.animationDuration) {
+                    this.isAnimating = false;
+                } else {
+                    requestAnimationFrame(checkAnimationEnd);
+                }
+            };
+            requestAnimationFrame(checkAnimationEnd);
         });
     }
 
