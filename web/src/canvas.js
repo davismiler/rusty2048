@@ -198,10 +198,12 @@ export class CanvasManager {
                 fontWeight: 'bold'
             }
         });
-        txt.anchor.set(0.5);       // 以文本几何中心为锚点
-        txt.x = half;              // 精确居中
-        txt.y = half;
-        txt.roundPixels = true;    // 避免半像素导致的视觉偏移
+        // 用本地边界做 pivot，严格几何居中
+        txt.updateText?.(); // v8可选，确保几何已生成
+        const b = txt.getLocalBounds();              // {x,y,width,height}
+        txt.pivot.set(b.x + b.width / 2, b.y + b.height / 2);
+        txt.position.set(this.TILE_SIZE / 2, this.TILE_SIZE / 2);
+        txt.roundPixels = true;
 
         inner.addChild(bg);
         inner.addChild(txt);
