@@ -1,0 +1,24 @@
+{
+  "name": "rusty2048-web",
+  "type": "module",
+  "collaborators": [
+    "Your Name <your.email@example.com>"
+  ],
+  "description": "Web interface for Rusty2048",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/rusty2048"
+  },
+  "files": [
+    "rusty2048_web_bg.wasm",
+    "rusty2048_web.js",
+    "rusty2048_web.d.ts"
+  ],
+  "main": "rusty2048_web.js",
+  "types": "rusty2048_web.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
