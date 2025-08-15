@@ -1,8 +1,6 @@
 import init, { Rusty2048Web, init_panic_hook } from '../pkg/rusty2048_web.js';
 import { CanvasManager } from './canvas-manager.js';
 
-
-
 class Game2048 {
     constructor() {
         this.canvasManager = new CanvasManager();

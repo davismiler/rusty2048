@@ -56,21 +56,28 @@ build_web() {
         cargo install wasm-pack
     fi
     
+    # Check if npm is installed
+    if ! command_exists npm; then
+        print_error "npm is not installed. Please install Node.js and npm first."
+        exit 1
+    fi
+    
     # Navigate to web directory
     cd web
+    
+    # Install dependencies if needed
+    if [ ! -d "node_modules" ]; then
+        print_status "Installing npm dependencies..."
+        npm install
+    fi
     
     # Build the WASM module
     print_status "Building WASM module..."
     wasm-pack build --target web --out-dir pkg
     
-    # Create dist directory if it doesn't exist
-    mkdir -p dist
-    
-    # Copy HTML and assets to dist
-    print_status "Copying files to dist..."
-    cp index.html dist/
-    cp test-panic.html dist/
-    cp -r pkg dist/
+    # Build the web application with Vite
+    print_status "Building web application with Vite..."
+    npm run build
     
     # Create _headers file for Vercel
     print_status "Creating _headers file..."
@@ -85,6 +92,7 @@ EOF
     print_success "Web version built successfully!"
     echo "   Files location: web/dist/"
     echo "   To serve: cd web/dist && python3 -m http.server 8000"
+    echo "   Or use: npm run preview (from web directory)"
 }
 
 # Function to build Desktop version
