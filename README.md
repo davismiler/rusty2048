@@ -25,7 +25,6 @@ A modern implementation of the 2048 game written in Rust, supporting multi-platf
 - **Statistics Charts**: Comprehensive game analytics (CLI version)
 - **PWA Support**: Progressive Web App with offline capability and app installation
 - **Auto-Save**: Automatic game state saving and restoration (Web version)
-- **Push Notifications**: Victory notifications when game is won (Web version)
 - **Responsive Design**: Optimized for mobile and desktop devices (Web version)
 
 📖 **[View Full Feature List](docs/FEATURES.md)** - Detailed information about all features, controls, and capabilities.
@@ -91,7 +90,6 @@ cd web/dist && python3 -m http.server 8000
 **Web Version Features:**
 - 📱 **PWA Support**: Install as native app with offline gaming capability
 - 💾 **Auto-Save**: Game progress automatically saved to local storage
-- 🔔 **Push Notifications**: Victory notifications when game is won
 - 📱 **Responsive Design**: Perfectly adapted for mobile and desktop devices
 - 🌐 **Offline Gaming**: Support for gaming experience without network connection
 

@@ -22,25 +22,14 @@ function initPWA() {
         }
     }
     
-    // 请求通知权限（在游戏胜利时使用）
-    if ('Notification' in window && Notification.permission === 'default') {
-        // 延迟请求权限，避免在页面加载时立即弹出
-        setTimeout(() => {
-            Notification.requestPermission();
-        }, 5000);
-    }
+    // 通知权限请求已关闭 - 用户需要手动授权
+    // 如果需要通知功能，用户可以在浏览器设置中手动开启
 }
 
-// 发送游戏胜利通知
+// 游戏胜利通知功能已移除
 function sendWinNotification(score) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('🎉 恭喜！', {
-            body: `你获得了 ${score} 分！`,
-            icon: '/icons/icon-192x192.png',
-            badge: '/icons/icon-72x72.png',
-            tag: 'game-won'
-        });
-    }
+    // 通知功能已禁用
+    console.log(`游戏胜利！得分：${score}`);
 }
 
 // Initialize game
@@ -51,7 +40,7 @@ async function initGame() {
     // 初始化 PWA 功能
     initPWA();
     
-    // 监听游戏胜利事件
+    // 游戏胜利事件处理
     if (game.onGameWon) {
         const originalOnGameWon = game.onGameWon;
         game.onGameWon = (score) => {
