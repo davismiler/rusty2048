@@ -10,11 +10,11 @@ export class CanvasManager {
 
         this.GRID_SIZE = 4;
 
-        this.TILE_SIZE = 88;        // 每格大小（会重新计算）
-        this.TILE_GAP = 12;        // 仅用于格与格之间的间距
-        this.CANVAS_W = 400;       // 画布宽高（可能非正方）
+        this.TILE_SIZE = 88;        // Tile size (will be recalculated)
+        this.TILE_GAP = 12;        // Gap between tiles
+        this.CANVAS_W = 400;       // Canvas width/height (may not be square)
         this.CANVAS_H = 400;
-        this.GRID_ORIGIN_X = 0;     // 网格左上角起点（会重新计算）
+        this.GRID_ORIGIN_X = 0;     // Grid top-left origin (will be recalculated)
         this.GRID_ORIGIN_Y = 0;
 
         this.TILE_COLORS = {
@@ -41,7 +41,7 @@ export class CanvasManager {
             roundPixels: true,
         });
         
-        // 启用像素对齐 (Pixi v8中roundPixels是只读的，在初始化时设置)
+        // Enable pixel alignment (roundPixels is read-only in Pixi v8, set during initialization)
         const container = document.querySelector('.canvas-container');
         const canvas = this.app.canvas;
         canvas.id = 'gameCanvas';
@@ -49,7 +49,7 @@ export class CanvasManager {
         canvas.style.cursor = 'grab';
         canvas.style.imageRendering = 'crisp-edges';
         canvas.style.imageRendering = '-webkit-optimize-contrast';
-        // 用新 canvas 替换旧的（如果 HTML 里已有一个占位 canvas）
+        // Replace old canvas with new one (if there's a placeholder canvas in HTML)
         const old = document.getElementById('gameCanvas');
         if (old && old !== canvas) old.replaceWith(canvas);
         else container.appendChild(canvas);
@@ -65,24 +65,24 @@ export class CanvasManager {
 
         const bounds = container.getBoundingClientRect();
 
-        // 画布尺寸（Pixi 会等比撑满容器；这里用可见区域）
+        // Canvas dimensions (Pixi will scale proportionally to fill container; use visible area here)
         const w = bounds.width || container.clientWidth || container.offsetWidth;
-        const h = bounds.height || container.clientHeight || container.offsetHeight || w;     // 你的容器用了 aspect-ratio:1，通常 w≈h
+        const h = bounds.height || container.clientHeight || container.offsetHeight || w;     // Your container uses aspect-ratio:1, usually w≈h
         this.CANVAS_W = w;
         this.CANVAS_H = h;
 
-        // 建议固定一个 gap 比例（或保持你原来的 12 像素常量）
-        // 这里用相对值，让不同尺寸下观感一致：
-        this.TILE_GAP = Math.max(8, Math.round(Math.min(w, h) * 0.03)); // 约 3% 宽
+        // Suggest using a fixed gap ratio (or keep your original 12px constant)
+        // Use relative values here for consistent appearance across different sizes:
+        this.TILE_GAP = Math.max(8, Math.round(Math.min(w, h) * 0.03)); // About 3% width
 
-        // 网格总宽高：GRID_SIZE 个 tile + (GRID_SIZE+1) 个 gap
-        // 反推 tile 尺寸（浮点避免累计误差）
+        // Grid total width/height: GRID_SIZE tiles + (GRID_SIZE+1) gaps
+        // Calculate tile size backwards (use float to avoid cumulative errors)
         const gridTotalW = w;
         const gridTotalH = h;
         const tileSizeW = (gridTotalW - (this.GRID_SIZE + 1) * this.TILE_GAP) / this.GRID_SIZE;
         const tileSizeH = (gridTotalH - (this.GRID_SIZE + 1) * this.TILE_GAP) / this.GRID_SIZE;
 
-        // 取正方形 tile，使用较小者以确保不超界
+        // Use square tiles, take the smaller one to ensure no overflow
         this.TILE_SIZE = Math.floor(Math.min(tileSizeW, tileSizeH));
 
         // 以最终 tileSize 反推“实际占用”的网格宽高
