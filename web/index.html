@@ -116,6 +116,18 @@
     <!-- 菜单遮罩 -->
     <div class="menu-overlay" id="menuOverlay"></div>
 
+    <!-- 新游戏确认弹窗 -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-content">
+            <h3 id="confirmTitle">Start New Game?</h3>
+            <p id="confirmMessage">Current game progress will be lost.</p>
+            <div class="confirm-buttons">
+                <button class="btn btn-cancel" id="cancelNewGame">Cancel</button>
+                <button class="btn btn-confirm" id="confirmNewGame">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>

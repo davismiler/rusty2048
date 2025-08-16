@@ -145,7 +145,7 @@ export class EventManager {
     setupButtonControls() {
         // 主界面按钮
         document.getElementById('newGame').addEventListener('click', async () => {
-            await this.game.handleNewGame();
+            await this.showNewGameConfirmation();
         });
 
         document.getElementById('undo').addEventListener('click', async () => {
@@ -297,6 +297,72 @@ export class EventManager {
                 const tiles = this.game.uiManager.boardToTiles(this.game.previousBoard);
                 this.canvasManager.drawBoardRaw(tiles);
             }
+        });
+    }
+
+    // 显示新游戏确认弹窗
+    async showNewGameConfirmation() {
+        const currentLanguage = this.game.currentLanguage;
+        const confirmDialog = document.getElementById('confirmDialog');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const cancelBtn = document.getElementById('cancelNewGame');
+        const confirmBtn = document.getElementById('confirmNewGame');
+
+        // 更新文本内容
+        if (currentLanguage === 'zh') {
+            confirmTitle.textContent = '确认开始新游戏？';
+            confirmMessage.textContent = '当前游戏进度将会丢失。';
+            cancelBtn.textContent = '取消';
+            confirmBtn.textContent = '确认';
+        } else {
+            confirmTitle.textContent = 'Start New Game?';
+            confirmMessage.textContent = 'Current game progress will be lost.';
+            cancelBtn.textContent = 'Cancel';
+            confirmBtn.textContent = 'Confirm';
+        }
+
+        // 显示弹窗
+        confirmDialog.classList.add('show');
+
+        // 绑定事件
+        return new Promise((resolve) => {
+            const handleCancel = () => {
+                confirmDialog.classList.remove('show');
+                cleanup();
+                resolve(false);
+            };
+
+            const handleConfirm = async () => {
+                confirmDialog.classList.remove('show');
+                cleanup();
+                await this.game.handleNewGame();
+                resolve(true);
+            };
+
+            const handleEsc = (e) => {
+                if (e.key === 'Escape') {
+                    handleCancel();
+                }
+            };
+
+            const handleOverlayClick = (e) => {
+                if (e.target === confirmDialog) {
+                    handleCancel();
+                }
+            };
+
+            const cleanup = () => {
+                cancelBtn.removeEventListener('click', handleCancel);
+                confirmBtn.removeEventListener('click', handleConfirm);
+                document.removeEventListener('keydown', handleEsc);
+                confirmDialog.removeEventListener('click', handleOverlayClick);
+            };
+
+            cancelBtn.addEventListener('click', handleCancel);
+            confirmBtn.addEventListener('click', handleConfirm);
+            document.addEventListener('keydown', handleEsc);
+            confirmDialog.addEventListener('click', handleOverlayClick);
         });
     }
 }
