@@ -23,6 +23,10 @@ A modern implementation of the 2048 game written in Rust, supporting multi-platf
 - **Theme System**: 5 beautiful themes (Classic, Dark, Neon, Retro, Pastel)
 - **Replay System**: Record and replay game sessions (CLI version)
 - **Statistics Charts**: Comprehensive game analytics (CLI version)
+- **PWA Support**: Progressive Web App with offline capability and app installation
+- **Auto-Save**: Automatic game state saving and restoration (Web version)
+- **Push Notifications**: Victory notifications when game is won (Web version)
+- **Responsive Design**: Optimized for mobile and desktop devices (Web version)
 
 📖 **[View Full Feature List](docs/FEATURES.md)** - Detailed information about all features, controls, and capabilities.
 
@@ -84,7 +88,14 @@ cd web && ./build.sh
 cd web/dist && python3 -m http.server 8000
 ```
 
-**🌐 Live Demo**: [Play on Vercel](https://rusty2048.vercel.app)
+**Web Version Features:**
+- 📱 **PWA Support**: Install as native app with offline gaming capability
+- 💾 **Auto-Save**: Game progress automatically saved to local storage
+- 🔔 **Push Notifications**: Victory notifications when game is won
+- 📱 **Responsive Design**: Perfectly adapted for mobile and desktop devices
+- 🌐 **Offline Gaming**: Support for gaming experience without network connection
+
+**🌐 Live Demo**: [Play on Vercel](https://rusty2048.vercel.app) - Install as PWA for offline play!
 
 ## 🎮 Basic Controls
 
@@ -153,13 +164,16 @@ cd desktop && cargo tauri build
 ### ✅ Completed
 - [x] Core game logic
 - [x] CLI version with full features
-- [x] Web version (WASM)
+- [x] Web version (WASM) with PWA support
 - [x] Desktop version (Tauri)
 - [x] Replay system (CLI version)
 - [x] AI mode (CLI and Web versions)
 - [x] Statistics charts (CLI version)
 - [x] Multi-language support (all versions)
 - [x] Theme system (all versions)
+- [x] Auto-save functionality (Web version)
+- [x] Push notifications (Web version)
+- [x] Offline capability (Web version)
 
 ### 🔄 Future Enhancements
 - [ ] AI mode for Desktop version

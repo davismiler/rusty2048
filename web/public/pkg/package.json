@@ -1,6 +1,5 @@
 {
   "name": "rusty2048-web",
-  "type": "module",
   "collaborators": [
     "Your Name <your.email@example.com>"
   ],
@@ -16,7 +15,7 @@
     "rusty2048_web.js",
     "rusty2048_web.d.ts"
   ],
-  "main": "rusty2048_web.js",
+  "module": "rusty2048_web.js",
   "types": "rusty2048_web.d.ts",
   "sideEffects": [
     "./snippets/*"
