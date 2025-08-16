@@ -145,12 +145,8 @@ export class UIManager {
         if (undoBtn) undoBtn.textContent = this.game.get_translation('undo');
         
         // Update side menu button texts
-        const newGameMenu = document.getElementById('newGameMenu');
-        const undoMenu = document.getElementById('undoMenu');
         const languageToggleMenu = document.getElementById('languageToggleMenu');
         
-        if (newGameMenu) newGameMenu.textContent = this.game.get_translation('new_game');
-        if (undoMenu) undoMenu.textContent = this.game.get_translation('undo');
         if (languageToggleMenu) {
             languageToggleMenu.textContent = this.currentLanguage === 'zh' ? 'English' : '中文';
         }
@@ -162,6 +158,26 @@ export class UIManager {
                 instructions.textContent = '使用方向键、鼠标拖拽或滑动来移动瓦片。合并瓦片以达到2048！';
             } else {
                 instructions.textContent = 'Use arrow keys, mouse drag, or swipe to move tiles. Combine tiles to reach 2048!';
+            }
+        }
+
+        // Update confirm dialog texts
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const cancelBtn = document.getElementById('cancelNewGame');
+        const confirmBtn = document.getElementById('confirmNewGame');
+        
+        if (confirmTitle && confirmMessage && cancelBtn && confirmBtn) {
+            if (this.currentLanguage === 'zh') {
+                confirmTitle.textContent = '确认开始新游戏？';
+                confirmMessage.textContent = '当前游戏进度将会丢失。';
+                cancelBtn.textContent = '取消';
+                confirmBtn.textContent = '确认';
+            } else {
+                confirmTitle.textContent = 'Start New Game?';
+                confirmMessage.textContent = 'Current game progress will be lost.';
+                cancelBtn.textContent = 'Cancel';
+                confirmBtn.textContent = 'Confirm';
             }
         }
     }

@@ -1,0 +1,24 @@
+/* 重置和基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #667eea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition: background-color 0.3s ease;
+    position: relative;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
