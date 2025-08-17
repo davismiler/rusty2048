@@ -13,6 +13,8 @@ export class EventManager {
         // Touch related state
         this.touchStartX = null;
         this.touchStartY = null;
+        this.touchStartTime = null;
+        this.touchMoved = false;
     }
 
     setupEventListeners() {
@@ -228,29 +230,69 @@ export class EventManager {
 
         if (!canvasElement) return;
 
+        // 添加触摸状态跟踪
+        this.touchStartTime = null;
+        this.touchMoved = false;
+
         canvasElement.addEventListener('touchstart', (e) => {
             // 阻止默认行为，防止页面滚动
             e.preventDefault();
             this.touchStartX = e.touches[0].clientX;
             this.touchStartY = e.touches[0].clientY;
+            this.touchStartTime = Date.now();
+            this.touchMoved = false;
+        }, { passive: false });
+
+        canvasElement.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            if (!this.touchStartX || !this.touchStartY) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = Math.abs(currentX - this.touchStartX);
+            const diffY = Math.abs(currentY - this.touchStartY);
+            
+            // 标记已经移动
+            if (diffX > 5 || diffY > 5) {
+                this.touchMoved = true;
+            }
         }, { passive: false });
 
         canvasElement.addEventListener('touchend', (e) => {
-            // 阻止默认行为
             e.preventDefault();
 
-            if (!this.touchStartX || !this.touchStartY) return;
+            if (!this.touchStartX || !this.touchStartY || !this.touchStartTime) {
+                this.resetTouchState();
+                return;
+            }
 
             const endX = e.changedTouches[0].clientX;
             const endY = e.changedTouches[0].clientY;
+            const touchDuration = Date.now() - this.touchStartTime;
 
             const diffX = this.touchStartX - endX;
             const diffY = this.touchStartY - endY;
 
-            // 添加最小滑动距离阈值
-            const minSwipeDistance = 30;
+            // 优化滑动判定参数
+            const minSwipeDistance = 20; // 降低最小滑动距离
+            const maxTouchDuration = 300; // 最大触摸时间（毫秒）
+            
+            // 检查是否满足滑动条件
             if (Math.abs(diffX) < minSwipeDistance && Math.abs(diffY) < minSwipeDistance) {
-                this.touchStartX = this.touchStartY = null;
+                this.resetTouchState();
+                return;
+            }
+
+            // 检查触摸时间是否过长
+            if (touchDuration > maxTouchDuration) {
+                this.resetTouchState();
+                return;
+            }
+
+            // 确保确实发生了移动
+            if (!this.touchMoved) {
+                this.resetTouchState();
                 return;
             }
 
@@ -272,22 +314,26 @@ export class EventManager {
             }
 
             if (direction) {
-                // Quick check game state without blocking
+                // 立即处理移动，减少延迟
                 this.game.get_state().then(state => {
                     if (state === 'playing') {
-                        // Async move processing without blocking touch events
                         this.game.handleMove(direction);
                     }
+                }).catch(() => {
+                    // 如果状态检查失败，直接尝试移动
+                    this.game.handleMove(direction);
                 });
             }
 
-            this.touchStartX = this.touchStartY = null;
+            this.resetTouchState();
         }, { passive: false });
+    }
 
-        // 防止触摸事件冒泡到document
-        canvasElement.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-        }, { passive: false });
+    resetTouchState() {
+        this.touchStartX = null;
+        this.touchStartY = null;
+        this.touchStartTime = null;
+        this.touchMoved = false;
     }
 
     setupResizeHandler() {
