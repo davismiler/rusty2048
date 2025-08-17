@@ -177,7 +177,8 @@ class CanvasManager {
         
         if (progress < 1 || hasActiveMergeAnimations) {
             // 继续动画（移动动画未完成或合并动画在进行）
-            this.animationFrameId = setTimeout(() => this.animate(), 16); // ~60fps
+            // 使用较短的间隔，让主线程的requestAnimationFrame来控制节奏
+            this.animationFrameId = setTimeout(() => this.animate(), 8); // ~120fps
         } else {
             // 所有动画完成
             this.isAnimating = false;

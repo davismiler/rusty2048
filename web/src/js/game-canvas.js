@@ -152,10 +152,44 @@ export class CanvasManager {
     drawBoardWithAnimation(animTiles) {
         if (!this.isInitialized) return;
         
+        // 使用主线程的requestAnimationFrame来同步Worker动画
+        this.startAnimationSync();
+        
         this.worker.postMessage({
             type: 'drawBoardWithAnimation',
             data: { animTiles }
         });
+    }
+
+    // 主线程动画同步
+    startAnimationSync() {
+        if (this.animationSyncId) return; // 避免重复启动
+        
+        const syncAnimation = () => {
+            // 检查Worker是否还在动画中
+            this.isAnimatingNow().then(animating => {
+                if (animating) {
+                    // 继续同步
+                    this.animationSyncId = requestAnimationFrame(syncAnimation);
+                } else {
+                    // 动画完成，停止同步
+                    this.animationSyncId = null;
+                }
+            }).catch(() => {
+                // 如果检查失败，停止同步
+                this.animationSyncId = null;
+            });
+        };
+        
+        this.animationSyncId = requestAnimationFrame(syncAnimation);
+    }
+
+    // 停止动画同步
+    stopAnimationSync() {
+        if (this.animationSyncId) {
+            cancelAnimationFrame(this.animationSyncId);
+            this.animationSyncId = null;
+        }
     }
 
     getCanvas() { 
@@ -190,6 +224,9 @@ export class CanvasManager {
 
     // 清理资源
     destroy() {
+        // 停止动画同步
+        this.stopAnimationSync();
+        
         if (this.worker) {
             this.worker.terminate();
             this.worker = null;
