@@ -3,7 +3,7 @@ name = "rusty2048-shared"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
-description = "Shared components for Rusty2048"
+description = "Shared components for Rusty2048 - Internationalization and theme system"
 license.workspace = true
 repository.workspace = true
 

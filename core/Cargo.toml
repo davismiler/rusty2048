@@ -3,7 +3,7 @@ name = "rusty2048-core"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
-description = "Core game logic for Rusty2048"
+description = "Core game logic for Rusty2048 - A modern 2048 game implementation with AI, scoring, and replay system"
 license.workspace = true
 repository.workspace = true
 
