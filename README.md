@@ -46,18 +46,12 @@ rusty2048/
 
 ### Install CLI Version (Recommended)
 
-#### Method 1: Install with Cargo (Simplest)
-```bash
-cargo install rusty2048-cli
-rusty2048
-```
-
-#### Method 2: One-click Installation Script
+#### Method 1: One-click Installation Script
 ```bash
 curl -fsSL https://raw.githubusercontent.com/honkinglin/rusty2048/main/scripts/install.sh | bash
 ```
 
-#### Method 3: Download Pre-compiled Binaries
+#### Method 2: Download Pre-compiled Binaries
 Visit [GitHub Releases](https://github.com/honkinglin/rusty2048/releases) to download binaries for your platform.
 
 ### Development Build

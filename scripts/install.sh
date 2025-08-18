@@ -48,18 +48,7 @@ detect_arch() {
     esac
 }
 
-# Install using Cargo
-install_with_cargo() {
-    print_status "Installing Rusty2048 CLI with Cargo..."
-    
-    if ! command -v cargo &> /dev/null; then
-        print_error "Cargo not installed. Please install Rust first: https://rustup.rs/"
-        return 1
-    fi
-    
-    cargo install rusty2048-cli
-    print_success "Installation complete! Use 'rusty2048' command to start the game"
-}
+
 
 # Download pre-compiled binary
 download_binary() {
@@ -147,29 +136,25 @@ main() {
     fi
     
     echo "Choose installation method:"
-    echo "1. Install with Cargo (Recommended)"
-    echo "2. Download pre-compiled binary"
-    echo "3. Use system package manager"
-    echo "4. Exit"
+    echo "1. Download pre-compiled binary (Recommended)"
+    echo "2. Use system package manager"
+    echo "3. Exit"
     echo ""
     
-    read -p "Please choose (1-4): " choice
+    read -p "Please choose (1-3): " choice
     
     case $choice in
         1)
-            install_with_cargo
-            ;;
-        2)
             read -p "Enter version number (leave empty for latest): " version
             download_binary "$version"
             ;;
-        3)
+        2)
             if ! install_with_package_manager; then
-                print_warning "System package manager not supported, trying Cargo installation..."
-                install_with_cargo
+                print_error "System package manager not supported on this platform"
+                exit 1
             fi
             ;;
-        4)
+        3)
             print_status "Exiting installation"
             exit 0
             ;;

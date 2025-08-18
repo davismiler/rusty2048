@@ -9,9 +9,9 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.6"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Kyrie Lin <a154571896@gmail.com>"]
 description = "A modern 2048 game implementation in Rust"
 license = "MIT"
 repository = "https://github.com/yourusername/rusty2048"
