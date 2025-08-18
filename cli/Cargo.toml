@@ -15,8 +15,8 @@ name = "rusty2048"
 path = "src/main.rs"
 
 [dependencies]
-rusty2048-core = { path = "../core" }
-rusty2048-shared = { path = "../shared" }
+rusty2048-core = { version.workspace = true, path = "../core" }
+rusty2048-shared = { version.workspace = true, path = "../shared" }
 crossterm.workspace = true
 ratatui.workspace = true
 tracing.workspace = true
