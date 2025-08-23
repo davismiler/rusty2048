@@ -11,6 +11,7 @@ class CanvasManager {
         this.mergeAnimations = new Map(); // 存储合并动画状态
         this.fontSize = 0; // 缓存字体大小
         this.fontSizeCache = new Map(); // 缓存不同数字的字体大小
+        this.useBitmapFont = false; // 是否使用位图字体渲染
 
         this.GRID_SIZE = 4;
         this.TILE_SIZE = 88;
@@ -34,16 +35,24 @@ class CanvasManager {
 
     init(offscreenCanvas, containerWidth, containerHeight, devicePixelRatio) {
         this.canvas = offscreenCanvas;
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas.getContext('2d', {
+            alpha: true,
+            desynchronized: false,
+            willReadFrequently: false
+        });
         this.devicePixelRatio = devicePixelRatio || 1;
         
-        // 设置 canvas 尺寸
+        // 设置 canvas 尺寸（已经是考虑了设备像素比的尺寸）
         this.canvas.width = containerWidth;
         this.canvas.height = containerHeight;
         
-        // 设置上下文缩放以匹配设备像素比
+        // 需要重新启用缩放，因为我们现在使用更高分辨率
         this.ctx.scale(this.devicePixelRatio, this.devicePixelRatio);
         
+        // 重新设置字体渲染优化
+        this.setupFontRendering();
+        
+        // 传入实际的容器尺寸（CSS尺寸），而不是设备像素比调整后的尺寸
         this.calculateCanvasSize(containerWidth / this.devicePixelRatio, containerHeight / this.devicePixelRatio);
         this.drawGrid();
     }
@@ -55,26 +64,26 @@ class CanvasManager {
         this.CANVAS_W = w;
         this.CANVAS_H = h;
 
-        // 优化：使用位运算代替Math.round
-        this.TILE_GAP = Math.max(8, (Math.min(w, h) * 0.03) | 0);
+        // 使用 Math.round 代替位运算，提高精度
+        this.TILE_GAP = Math.max(8, Math.round(Math.min(w, h) * 0.03));
 
         const gridTotalW = w;
         const gridTotalH = h;
         const tileSizeW = (gridTotalW - (this.GRID_SIZE + 1) * this.TILE_GAP) / this.GRID_SIZE;
         const tileSizeH = (gridTotalH - (this.GRID_SIZE + 1) * this.TILE_GAP) / this.GRID_SIZE;
 
-        // 优化：使用位运算代替Math.floor
-        this.TILE_SIZE = Math.min(tileSizeW, tileSizeH) | 0;
+        // 使用 Math.floor 代替位运算，提高精度
+        this.TILE_SIZE = Math.floor(Math.min(tileSizeW, tileSizeH));
 
         const actualGridW = this.GRID_SIZE * this.TILE_SIZE + (this.GRID_SIZE + 1) * this.TILE_GAP;
         const actualGridH = this.GRID_SIZE * this.TILE_SIZE + (this.GRID_SIZE + 1) * this.TILE_GAP;
 
-        // 优化：使用位运算代替Math.round和Math.floor
-        this.GRID_ORIGIN_X = ((w - actualGridW) / 2) | 0;
-        this.GRID_ORIGIN_Y = ((h - actualGridH) / 2) | 0;
+        // 使用 Math.round 代替位运算，提高精度
+        this.GRID_ORIGIN_X = Math.round((w - actualGridW) / 2);
+        this.GRID_ORIGIN_Y = Math.round((h - actualGridH) / 2);
         
-        // 更新缓存的字体大小
-        this.fontSize = (this.TILE_SIZE * 0.5) | 0;
+        // 更新缓存的字体大小，使用 Math.round 提高精度
+        this.fontSize = Math.round(this.TILE_SIZE * 0.5);
         
         // 清除字体大小缓存，因为tile大小改变了
         this.clearFontSizeCache();
@@ -251,8 +260,9 @@ class CanvasManager {
             const endX = this.positionToXY(tile.x, tile.y).x;
             const endY = this.positionToXY(tile.x, tile.y).y;
             
-            x = startX + (endX - startX) * progress;
-            y = startY + (endY - startY) * progress;
+            // 使用 Math.round 确保坐标精度
+            x = Math.round(startX + (endX - startX) * progress);
+            y = Math.round(startY + (endY - startY) * progress);
         } else {
             // 新生动画
             const pos = this.positionToXY(tile.x, tile.y);
@@ -263,8 +273,9 @@ class CanvasManager {
                 // 新生tile的缩放动画
                 const scale = progress * mergeScale; // 结合新生和合并缩放
                 const scaledSize = this.TILE_SIZE * scale;
-                const offsetX = (this.TILE_SIZE - scaledSize) / 2;
-                const offsetY = (this.TILE_SIZE - scaledSize) / 2;
+                // 使用 Math.round 确保偏移量精度
+                const offsetX = Math.round((this.TILE_SIZE - scaledSize) / 2);
+                const offsetY = Math.round((this.TILE_SIZE - scaledSize) / 2);
                 
                 this.ctx.save();
                 this.ctx.translate(x + offsetX, y + offsetY);
@@ -278,19 +289,15 @@ class CanvasManager {
                     
                     // 使用自适应字体大小
                     const fontSize = this.getAdaptiveFontSize(tile.value);
-                    this.ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
+                    this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
                     this.ctx.textAlign = 'center';
                     this.ctx.textBaseline = 'middle';
                     
-                    // 启用字体平滑
-                    this.ctx.imageSmoothingEnabled = true;
-                    this.ctx.imageSmoothingQuality = 'high';
+                    // 设置字体渲染优化
+                    this.setupFontRendering();
                     
                     // 绘制文字阴影以提高可读性
-                    this.ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-                    this.ctx.shadowBlur = 1;
-                    this.ctx.shadowOffsetX = 0;
-                    this.ctx.shadowOffsetY = 1;
+                    this.setupTextShadow();
                     
                     this.ctx.fillText(
                         String(tile.value), 
@@ -299,10 +306,7 @@ class CanvasManager {
                     );
                     
                     // 重置阴影
-                    this.ctx.shadowColor = 'transparent';
-                    this.ctx.shadowBlur = 0;
-                    this.ctx.shadowOffsetX = 0;
-                    this.ctx.shadowOffsetY = 0;
+                    this.clearTextShadow();
                 }
                 this.ctx.restore();
                 return;
@@ -312,8 +316,9 @@ class CanvasManager {
         // 如果是合并的tile，应用合并缩放
         if (isMergedTile && mergeScale !== 1.0) {
             const scaledSize = this.TILE_SIZE * mergeScale;
-            const offsetX = (this.TILE_SIZE - scaledSize) / 2;
-            const offsetY = (this.TILE_SIZE - scaledSize) / 2;
+            // 使用 Math.round 确保偏移量精度
+            const offsetX = Math.round((this.TILE_SIZE - scaledSize) / 2);
+            const offsetY = Math.round((this.TILE_SIZE - scaledSize) / 2);
             
             this.ctx.save();
             this.ctx.translate(x + offsetX, y + offsetY);
@@ -329,19 +334,15 @@ class CanvasManager {
                 
                 // 使用自适应字体大小
                 const fontSize = this.getAdaptiveFontSize(tile.value);
-                this.ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
+                this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
                 
-                // 启用字体平滑
-                this.ctx.imageSmoothingEnabled = true;
-                this.ctx.imageSmoothingQuality = 'high';
+                // 设置字体渲染优化
+                this.setupFontRendering();
                 
                 // 绘制文字阴影以提高可读性
-                this.ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-                this.ctx.shadowBlur = 1;
-                this.ctx.shadowOffsetX = 0;
-                this.ctx.shadowOffsetY = 1;
+                this.setupTextShadow();
                 
                 this.ctx.fillText(
                     String(tile.value), 
@@ -350,10 +351,7 @@ class CanvasManager {
                 );
                 
                 // 重置阴影
-                this.ctx.shadowColor = 'transparent';
-                this.ctx.shadowBlur = 0;
-                this.ctx.shadowOffsetX = 0;
-                this.ctx.shadowOffsetY = 0;
+                this.clearTextShadow();
             }
             
             this.ctx.restore();
@@ -368,19 +366,15 @@ class CanvasManager {
                 
                 // 使用自适应字体大小
                 const fontSize = this.getAdaptiveFontSize(tile.value);
-                this.ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
+                this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
                 
-                // 启用字体平滑
-                this.ctx.imageSmoothingEnabled = true;
-                this.ctx.imageSmoothingQuality = 'high';
+                // 设置字体渲染优化
+                this.setupFontRendering();
                 
                 // 绘制文字阴影以提高可读性
-                this.ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-                this.ctx.shadowBlur = 1;
-                this.ctx.shadowOffsetX = 0;
-                this.ctx.shadowOffsetY = 1;
+                this.setupTextShadow();
                 
                 this.ctx.fillText(
                     String(tile.value), 
@@ -389,10 +383,7 @@ class CanvasManager {
                 );
                 
                 // 重置阴影
-                this.ctx.shadowColor = 'transparent';
-                this.ctx.shadowBlur = 0;
-                this.ctx.shadowOffsetX = 0;
-                this.ctx.shadowOffsetY = 0;
+                this.clearTextShadow();
             }
         }
     }
@@ -412,19 +403,15 @@ class CanvasManager {
             
             // 使用自适应字体大小
             const fontSize = this.getAdaptiveFontSize(value);
-            this.ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
+            this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             
-            // 启用字体平滑
-            this.ctx.imageSmoothingEnabled = true;
-            this.ctx.imageSmoothingQuality = 'high';
+            // 设置字体渲染优化
+            this.setupFontRendering();
             
             // 绘制文字阴影以提高可读性
-            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-            this.ctx.shadowBlur = 1;
-            this.ctx.shadowOffsetX = 0;
-            this.ctx.shadowOffsetY = 1;
+            this.setupTextShadow();
             
             this.ctx.fillText(
                 String(value), 
@@ -433,17 +420,15 @@ class CanvasManager {
             );
             
             // 重置阴影
-            this.ctx.shadowColor = 'transparent';
-            this.ctx.shadowBlur = 0;
-            this.ctx.shadowOffsetX = 0;
-            this.ctx.shadowOffsetY = 0;
+            this.clearTextShadow();
         }
     }
 
     positionToXY(col, row) {
         const x = this.GRID_ORIGIN_X + this.TILE_GAP + col * (this.TILE_SIZE + this.TILE_GAP);
         const y = this.GRID_ORIGIN_Y + this.TILE_GAP + row * (this.TILE_SIZE + this.TILE_GAP);
-        return { x: x | 0, y: y | 0 };
+        // 使用 Math.round 代替位运算，提高精度
+        return { x: Math.round(x), y: Math.round(y) };
     }
 
     resize(containerWidth, containerHeight, devicePixelRatio) {
@@ -453,8 +438,11 @@ class CanvasManager {
         this.canvas.width = containerWidth;
         this.canvas.height = containerHeight;
         
-        // 重新设置上下文缩放
+        // 需要重新启用缩放，因为我们现在使用更高分辨率
         this.ctx.scale(this.devicePixelRatio, this.devicePixelRatio);
+        
+        // 重新设置字体渲染优化
+        this.setupFontRendering();
         
         this.calculateCanvasSize(containerWidth / this.devicePixelRatio, containerHeight / this.devicePixelRatio);
         this.drawGrid();
@@ -487,22 +475,25 @@ class CanvasManager {
         // 基础字体大小（4位数以内）
         let fontSize = this.fontSize;
         
-        // 根据位数调整字体大小
+        // 根据位数调整字体大小，使用更精确的比例
         if (digitCount === 1) {
-            fontSize = this.fontSize; // 1位数：100%
+            fontSize = this.fontSize * 0.95; // 1位数：95%，留一些边距
         } else if (digitCount === 2) {
-            fontSize = this.fontSize * 0.9; // 2位数：90%
+            fontSize = this.fontSize * 0.85; // 2位数：85%
         } else if (digitCount === 3) {
-            fontSize = this.fontSize * 0.75; // 3位数：75%
+            fontSize = this.fontSize * 0.7; // 3位数：70%
         } else if (digitCount === 4) {
-            fontSize = this.fontSize * 0.6; // 4位数：60%
+            fontSize = this.fontSize * 0.55; // 4位数：55%
         } else {
-            fontSize = this.fontSize * 0.5; // 5位数及以上：50%
+            fontSize = this.fontSize * 0.45; // 5位数及以上：45%
         }
         
         // 确保字体大小不小于最小值
-        const minFontSize = Math.max(12, this.TILE_SIZE * 0.2);
+        const minFontSize = Math.max(14, this.TILE_SIZE * 0.25);
         fontSize = Math.max(fontSize, minFontSize);
+        
+        // 使用 Math.round 确保字体大小为整数，提高渲染精度
+        fontSize = Math.round(fontSize);
         
         // 缓存结果
         this.fontSizeCache.set(value, fontSize);
@@ -513,6 +504,91 @@ class CanvasManager {
     // 清除字体大小缓存（当tile大小改变时调用）
     clearFontSizeCache() {
         this.fontSizeCache.clear();
+    }
+
+    // 测试渲染质量的方法
+    testRenderingQuality() {
+        if (!this.ctx) return;
+        
+        // 绘制测试文字
+        this.ctx.fillStyle = '#776e65';
+        this.ctx.font = 'bold 24px Arial, sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        
+        // 设置高质量渲染
+        this.setupFontRendering();
+        
+        // 绘制测试文字
+        this.ctx.fillText('2048', 100, 100);
+        
+        // 清除阴影
+        this.clearTextShadow();
+    }
+
+    // 备选方案：使用位图字体渲染（如果文字仍然模糊）
+    drawTextWithBitmapFont(value, x, y, fontSize) {
+        if (!this.ctx) return;
+        
+        // 创建一个临时的canvas来渲染文字
+        const tempCanvas = new OffscreenCanvas(fontSize * 2, fontSize * 2);
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // 设置临时canvas的尺寸
+        tempCanvas.width = fontSize * 2;
+        tempCanvas.height = fontSize * 2;
+        
+        // 在临时canvas上绘制文字
+        tempCtx.fillStyle = this.ctx.fillStyle;
+        tempCtx.font = `bold ${fontSize}px Arial, sans-serif`;
+        tempCtx.textAlign = 'center';
+        tempCtx.textBaseline = 'middle';
+        
+        // 禁用平滑
+        tempCtx.imageSmoothingEnabled = false;
+        
+        tempCtx.fillText(String(value), fontSize, fontSize);
+        
+        // 将临时canvas的内容绘制到主canvas上
+        this.ctx.drawImage(tempCanvas, x - fontSize, y - fontSize);
+    }
+
+    // 设置字体渲染优化
+    setupFontRendering() {
+        // 在缩放后，我们需要重新设置图像平滑
+        this.ctx.imageSmoothingEnabled = false;
+        // this.ctx.imageSmoothingQuality = 'high';
+        
+        // 设置字体渲染优化
+        if (this.ctx.textRenderingOptimization !== undefined) {
+            this.ctx.textRenderingOptimization = 'optimizeSpeed';
+        }
+        
+        // 禁用字体平滑以提高锐度
+        if (this.ctx.fontSmoothingEnabled !== undefined) {
+            this.ctx.fontSmoothingEnabled = false;
+        }
+        
+        // 设置文本基线对齐
+        this.ctx.textBaseline = 'middle';
+        this.ctx.textAlign = 'center';
+    }
+
+    // 绘制文字阴影 - 完全移除阴影以提高清晰度
+    setupTextShadow() {
+        // 暂时不设置阴影，专注于文字本身的清晰度
+        // this.ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+        // this.ctx.shadowBlur = 0.5;
+        // this.ctx.shadowOffsetX = 0;
+        // this.ctx.shadowOffsetY = 0.5;
+    }
+
+    // 清除文字阴影
+    clearTextShadow() {
+        this.ctx.shadowColor = 'transparent';
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
     }
 }
 

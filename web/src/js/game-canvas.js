@@ -20,6 +20,9 @@ export class CanvasManager {
         this.canvas.style.cursor = 'grab';
         this.canvas.style.imageRendering = 'crisp-edges';
         this.canvas.style.imageRendering = '-webkit-optimize-contrast';
+        // 优化字体渲染
+        this.canvas.style.webkitFontSmoothing = 'antialiased';
+        this.canvas.style.mozOsxFontSmoothing = 'grayscale';
         
         // 替换旧 canvas
         const old = document.getElementById('gameCanvas');
@@ -38,9 +41,13 @@ export class CanvasManager {
         this.canvas.style.width = width + 'px';
         this.canvas.style.height = height + 'px';
         
-        // 设置 canvas 的实际尺寸（考虑设备像素比）
-        this.canvas.width = width * devicePixelRatio;
-        this.canvas.height = height * devicePixelRatio;
+        // 使用更高的分辨率来提高文字清晰度
+        const resolutionMultiplier = Math.max(2, devicePixelRatio);
+        this.canvas.width = width * resolutionMultiplier;
+        this.canvas.height = height * resolutionMultiplier;
+        
+        // 存储设备像素比，供后续使用
+        this.devicePixelRatio = devicePixelRatio;
 
         // 创建 Worker
         this.worker = new Worker(new URL('./renderer.worker.js', import.meta.url), { type: 'module' });
@@ -52,13 +59,13 @@ export class CanvasManager {
         this.offscreenCanvas = this.canvas.transferControlToOffscreen();
         
         // 初始化 Worker
-        await this.initWorker(width, height, devicePixelRatio);
+        await this.initWorker(width, height, resolutionMultiplier);
         
         // 设置 resize 监听
         window.addEventListener('resize', () => this.handleResize());
     }
 
-    async initWorker(width, height, devicePixelRatio) {
+    async initWorker(width, height, resolutionMultiplier) {
         return new Promise((resolve) => {
             const messageHandler = (e) => {
                 if (e.data.type === 'initComplete') {
@@ -74,9 +81,9 @@ export class CanvasManager {
                 type: 'init',
                 data: {
                     offscreenCanvas: this.offscreenCanvas,
-                    width: width * devicePixelRatio,
-                    height: height * devicePixelRatio,
-                    devicePixelRatio
+                    width: width * resolutionMultiplier,
+                    height: height * resolutionMultiplier,
+                    devicePixelRatio: resolutionMultiplier
                 }
             }, [this.offscreenCanvas]);
         });
@@ -115,17 +122,27 @@ export class CanvasManager {
         // 获取设备像素比
         const devicePixelRatio = window.devicePixelRatio || 1;
         
+        // 使用更高的分辨率来提高文字清晰度
+        const resolutionMultiplier = Math.max(2, devicePixelRatio);
+        
+        // 更新存储的设备像素比
+        this.devicePixelRatio = resolutionMultiplier;
+        
         // 设置 canvas 的 CSS 尺寸
         this.canvas.style.width = width + 'px';
         this.canvas.style.height = height + 'px';
         
-        // 通知 Worker 调整尺寸（Worker会处理实际的canvas尺寸调整）
+        // 设置 canvas 的实际尺寸（使用更高分辨率）
+        this.canvas.width = width * resolutionMultiplier;
+        this.canvas.height = height * resolutionMultiplier;
+        
+        // 通知 Worker 调整尺寸
         this.worker.postMessage({
             type: 'resize',
             data: {
-                width: width * devicePixelRatio,
-                height: height * devicePixelRatio,
-                devicePixelRatio
+                width: width * resolutionMultiplier,
+                height: height * resolutionMultiplier,
+                devicePixelRatio: resolutionMultiplier
             }
         });
     }
