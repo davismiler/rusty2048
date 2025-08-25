@@ -296,17 +296,11 @@ class CanvasManager {
                     // 设置字体渲染优化
                     this.setupFontRendering();
                     
-                    // 绘制文字阴影以提高可读性
-                    this.setupTextShadow();
-                    
                     this.ctx.fillText(
                         String(tile.value), 
                         this.TILE_SIZE / 2, 
                         this.TILE_SIZE / 2
                     );
-                    
-                    // 重置阴影
-                    this.clearTextShadow();
                 }
                 this.ctx.restore();
                 return;
@@ -341,17 +335,11 @@ class CanvasManager {
                 // 设置字体渲染优化
                 this.setupFontRendering();
                 
-                // 绘制文字阴影以提高可读性
-                this.setupTextShadow();
-                
                 this.ctx.fillText(
                     String(tile.value), 
                     this.TILE_SIZE / 2, 
                     this.TILE_SIZE / 2
                 );
-                
-                // 重置阴影
-                this.clearTextShadow();
             }
             
             this.ctx.restore();
@@ -373,17 +361,11 @@ class CanvasManager {
                 // 设置字体渲染优化
                 this.setupFontRendering();
                 
-                // 绘制文字阴影以提高可读性
-                this.setupTextShadow();
-                
                 this.ctx.fillText(
                     String(tile.value), 
                     x + this.TILE_SIZE / 2, 
                     y + this.TILE_SIZE / 2
                 );
-                
-                // 重置阴影
-                this.clearTextShadow();
             }
         }
     }
@@ -410,17 +392,11 @@ class CanvasManager {
             // 设置字体渲染优化
             this.setupFontRendering();
             
-            // 绘制文字阴影以提高可读性
-            this.setupTextShadow();
-            
             this.ctx.fillText(
                 String(value), 
                 x + this.TILE_SIZE / 2, 
                 y + this.TILE_SIZE / 2
             );
-            
-            // 重置阴影
-            this.clearTextShadow();
         }
     }
 
@@ -521,9 +497,6 @@ class CanvasManager {
         
         // 绘制测试文字
         this.ctx.fillText('2048', 100, 100);
-        
-        // 清除阴影
-        this.clearTextShadow();
     }
 
     // 备选方案：使用位图字体渲染（如果文字仍然模糊）
@@ -574,22 +547,7 @@ class CanvasManager {
         this.ctx.textAlign = 'center';
     }
 
-    // 绘制文字阴影 - 完全移除阴影以提高清晰度
-    setupTextShadow() {
-        // 暂时不设置阴影，专注于文字本身的清晰度
-        // this.ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
-        // this.ctx.shadowBlur = 0.5;
-        // this.ctx.shadowOffsetX = 0;
-        // this.ctx.shadowOffsetY = 0.5;
-    }
 
-    // 清除文字阴影
-    clearTextShadow() {
-        this.ctx.shadowColor = 'transparent';
-        this.ctx.shadowBlur = 0;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
-    }
 }
 
 // Worker 实例
