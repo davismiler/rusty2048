@@ -85,10 +85,6 @@
 
 ## 🚀 Quick Start
 
-### Play Online (Easiest)
-
-Visit **[rusty2048.vercel.app](https://rusty2048.vercel.app)** to play instantly in your browser. No installation required!
-
 ### Install CLI Version
 
 **One-line installation:**
