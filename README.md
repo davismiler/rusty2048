@@ -9,8 +9,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
 
-[🌐 Play Online](https://rusty2048.vercel.app) • [📖 Documentation](docs/) • [🐛 Report Bug](https://github.com/davismiler/rusty2048/issues) • [💡 Request Feature](https://github.com/davismiler/rusty2048/issues)
-
 </div>
 
 ---
